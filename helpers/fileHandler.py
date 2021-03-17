@@ -4,32 +4,48 @@ import xarray
 #This is file handling
 from os import listdir
 
-
 #Import regex 
 import re
 
 #This is to figure out which computer this is running on 
 from platform import system
 
-def getFilePaths(directory, filterTerm):
-	# Directory to look for files
-	operatingSystem = system()
-	if operatingSystem == 'Windows':
-    		directory = 'E:/CMIP5-PMIP3/CESM-LME/mon/SST/'
-	elif operatingSystem == 'Darwin':
-    		directory = '/Volumes/Untitled/CMIP5-PMIP3/CESM-LME/mon/SST/'
-	else:
-    		raise EnvironmentError("Can't find data files. Operating System is " + operatingSystem)
+
+def getFilePaths(directory, *args):
+    """Returns a list of absolute paths from a chosen directory and file name filter
+    
+    Chosen directory is relative to the CMIP5-PMIP3 folder (i.e. where all models are kept)
+    
+    Optionally a second argument can be a regex term to search the chosen directory (default is all .nc files in the directory)
+    
+    """
+    
+    
+    # First, see if there is a second argument. If there is then this is the filterTerm, otherwise its just all .nc files
+    if len(args)==0:
+        filterTerm = '.+\.nc'
+    elif len(args)==1:
+        filterTerm = args[0]
+    else:
+        raise EnvironmentError("Wrong number of arguments provided")
+    
+    # Second, find a path to look for files
+    operatingSystem = system()
+    if operatingSystem == 'Windows':
+        directory = 'E:/CMIP5-PMIP3/' + directory
+    elif operatingSystem == 'Darwin':
+        directory = '/Volumes/Untitled/'  + directory +'/'
+    else:
+        raise EnvironmentError("Can't find where to look for data files. Operating System is " + operatingSystem)
     
 
-	# Get all the files in the directory
-	fileList = listdir(directory)
+    # Get all the files in the directory
+    fileList = listdir(directory)
 
-	# Get ensemble run of interest
-	regex = re.compile('b.e11.BLMTRC5CN.f19_g16.001.pop.h.SST.*.nc')
-	listRun1 = list(filter(regex.match, fileList))
+    # Get list of files from model run of interest accoding to the filter term
+    regex = re.compile(filterTerm)
+    listRun1 = list(filter(regex.match, fileList))
+    listRun1 = [directory + f for f in listRun1]
 
-	listRun1 = [directory + f for f in listRun1]
-
-	return listRun1
+    return listRun1
 
