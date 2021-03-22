@@ -19,8 +19,6 @@ def getFilePaths(directory, *args):
     Optionally a second argument can be a regex term to search the chosen directory (default is all .nc files in the directory)
     
     """
-    
-    
     # First, see if there is a second argument. If there is then this is the filterTerm, otherwise its just all .nc files
     if len(args)==0:
         filterTerm = '.+\.nc'
@@ -34,14 +32,17 @@ def getFilePaths(directory, *args):
     if operatingSystem == 'Windows':
         directory = 'E:/CMIP5-PMIP3/' + directory
     elif operatingSystem == 'Darwin':
-        directory = '/Volumes/Untitled/'  + directory +'/'
+        directory = '/Volumes/Untitled/CMIP5-PMIP3/'  + directory 
     else:
         raise EnvironmentError("Can't find where to look for data files. Operating System is " + operatingSystem)
     
 
     # Get all the files in the directory
-    fileList = listdir(directory)
-
+    try:
+        fileList = listdir(directory)
+    except:
+        raise EnvironmentError("Requested files not found. Is the harddrive plugged in and does this test case exist?")
+    
     # Get list of files from model run of interest accoding to the filter term
     regex = re.compile(filterTerm)
     listRun1 = list(filter(regex.match, fileList))
@@ -49,3 +50,49 @@ def getFilePaths(directory, *args):
 
     return listRun1
 
+
+
+def constructDirectoryPath(model, outputType, *args):
+    """Creates a directory name from arguments provided
+    
+    
+    valid inputs are: 
+    model: CESM-LME
+    outputType: CVDP, DAY, MON
+    *args: This is the variable desired
+    
+    Note there is no range checking on the last argument, it could be implemented but would be fiddly."""
+    # First, see if there is a third argument. If there is then this is the filterTerm, otherwise its just all .nc files
+    if outputType not in ('CVDP','DAY','MON'):
+        raise EnvironmentError(outputType + ' is not a valid type')
+    
+    if outputType in ('DAY','MON'):
+        if len(args)!=1:
+            raise EnvironmentError("Wrong number of arguments provided")
+    
+    if model == 'CESM-LME':
+        if outputType == 'CVDP':
+            directory = 'CESM-LME/cesm1.lm.cvdp_data/'
+        elif outputType == 'DAY':
+            directory = 'CESM-LME/day/' + args[0] + '/'
+        elif outputType == 'MON':
+            directory = 'CESM-LME/mon/' + args[0] + '/'
+    else:
+        raise EnvironmentError("Selected model not found")
+    
+    return directory
+
+def loadCESM(variable, test):
+    
+    
+    #filterTerm = 'b\.e11\.BLMTRC5CN\.f19_g16.001\.pop\.h\.SST\..+\.nc'
+    filterTerm = 'b\.e11\.BLMTRC5CN\.f19_g16\.' + test + '\.pop\.h\.' + variable + '\..+\.nc'
+    
+    directory = constructDirectoryPath('CESM-LME', 'MON', variable)
+    
+    paths = getFilePaths(directory, filterTerm)
+    
+    if len(paths)==0:
+        EnvironmentError("Files not found, possibly test name is wrong")
+    
+    return xarray.open_mfdataset(paths)
