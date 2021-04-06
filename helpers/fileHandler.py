@@ -12,7 +12,7 @@ from platform import system
 
 
 def getFilePaths(directory, *args):
-    """Returns a list of absolute paths from a chosen directory and file name filter
+    """Returns a list of absolute paths from a chosen directory
     
     Chosen directory is relative to the CMIP5-PMIP3 folder (i.e. where all models are kept)
     
@@ -61,7 +61,7 @@ def constructDirectoryPath(model, outputType, *args):
     outputType: CVDP, DAY, MON
     *args: This is the variable desired
     
-    Note there is no range checking on the last argument, it could be implemented but would be fiddly."""
+    Note there is no range checking on the last argument (should be a valid output variable for the desired model output)."""
     # First, see if there is a third argument. If there is then this is the filterTerm, otherwise its just all .nc files
     if outputType not in ('CVDP','DAY','MON'):
         raise EnvironmentError(outputType + ' is not a valid type')
@@ -72,7 +72,7 @@ def constructDirectoryPath(model, outputType, *args):
     
     if model == 'CESM-LME':
         if outputType == 'CVDP':
-            directory = 'CESM-LME/cesm1.lm.cvdp_data/'
+            directory = 'CESM-LME/cesm1.lmbycen.cvdp_data/'
         elif outputType == 'DAY':
             directory = 'CESM-LME/day/' + args[0] + '/'
         elif outputType == 'MON':
@@ -82,13 +82,18 @@ def constructDirectoryPath(model, outputType, *args):
     
     return directory
 
-def loadCESM(variable, test):
+def loadModelData(model, variable, test):
+    """load CESM"""
     
-    
-    #filterTerm = 'b\.e11\.BLMTRC5CN\.f19_g16.001\.pop\.h\.SST\..+\.nc'
-    filterTerm = 'b\.e11\.BLMTRC5CN\.f19_g16\.' + test + '\.pop\.h\.' + variable + '\..+\.nc'
-    
-    directory = constructDirectoryPath('CESM-LME', 'MON', variable)
+    if model=='CESM-LME' :
+        #exampleFilterTerm = 'b\.e11\.BLMTRC5CN\.f19_g16.001\.pop\.h\.SST\..+\.nc'
+        filterTerm = 'b\.e11\.BLMTRC5CN\.f19_g16\.' + test + '\..*?' + variable + '\..+\.nc'
+        if variable == "cvdp_data" :
+            directory = constructDirectoryPath('CESM-LME', 'CVDP')
+        else :
+            directory = constructDirectoryPath('CESM-LME', 'MON', variable)
+    else:
+        raise EnvironmentError("Selected model not supported, please add to file handler")  
     
     paths = getFilePaths(directory, filterTerm)
     
