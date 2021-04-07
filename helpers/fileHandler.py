@@ -10,6 +10,10 @@ import re
 #This is to figure out which computer this is running on 
 from platform import system
 
+#Import logging
+import logging
+
+
 
 def getFilePaths(directory, *args):
     """Returns a list of absolute paths from a chosen directory
@@ -72,7 +76,7 @@ def constructDirectoryPath(model, outputType, *args):
     
     if model == 'CESM-LME':
         if outputType == 'CVDP':
-            directory = 'CESM-LME/cesm1.lmbycen.cvdp_data/'
+            directory = 'CESM-LME/cesm1.lm.cvdp_data/'
         elif outputType == 'DAY':
             directory = 'CESM-LME/day/' + args[0] + '/'
         elif outputType == 'MON':
@@ -82,13 +86,25 @@ def constructDirectoryPath(model, outputType, *args):
     
     return directory
 
-def loadModelData(model, variable, test):
-    """load CESM"""
+def loadModelData(model, variable, test, **openDatasetKwargs):
+    """Loads data for the chosen model (CESM-LME is supported)
+    
+    
+    model = 'CESM-LME'
+    variable = folder name for that variable, or 'cvdp_data' if desired
+    test = name of model run, e.g. 001, or ORBITAL.003
+    keyword arguments are passted to the Xarray mfopen dataset (most likely to use decode_times=False, otherwise look at open_mfdataset documentation)
+    
+    
+    """
     
     if model=='CESM-LME' :
         #exampleFilterTerm = 'b\.e11\.BLMTRC5CN\.f19_g16.001\.pop\.h\.SST\..+\.nc'
         filterTerm = 'b\.e11\.BLMTRC5CN\.f19_g16\.' + test + '\..*?' + variable + '\..+\.nc'
-        if variable == "cvdp_data" :
+        
+        regex=re.compile('cvdp')
+        
+        if regex.search(variable):
             directory = constructDirectoryPath('CESM-LME', 'CVDP')
         else :
             directory = constructDirectoryPath('CESM-LME', 'MON', variable)
@@ -96,8 +112,10 @@ def loadModelData(model, variable, test):
         raise EnvironmentError("Selected model not supported, please add to file handler")  
     
     paths = getFilePaths(directory, filterTerm)
-    
+
+    print(paths)
+   
     if len(paths)==0:
         EnvironmentError("Files not found, possibly test name is wrong")
     
-    return xarray.open_mfdataset(paths)
+    return xarray.open_mfdataset(paths, **openDatasetKwargs)
