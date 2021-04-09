@@ -61,8 +61,8 @@ def constructDirectoryPath(model, outputType, *args):
     
     
     valid inputs are: 
-    model: CESM-LME
-    outputType: CVDP, DAY, MON
+    model: 'CESM-LME'
+    outputType: 'CVDP', 'DAY', 'MON'
     *args: This is the variable desired
     
     Note there is no range checking on the last argument (should be a valid output variable for the desired model output)."""
@@ -92,7 +92,7 @@ def loadModelData(model, variable, test, **openDatasetKwargs):
     
     model = 'CESM-LME'
     variable = folder name for that variable, or 'cvdp_data' if desired
-    test = name of model run, e.g. 001, or ORBITAL.003
+    test = name of model run, e.g. '001', or 'ORBITAL.003'
     keyword arguments are passted to the Xarray mfopen dataset (most likely to use decode_times=False, otherwise look at open_mfdataset documentation)
     
     
