@@ -113,9 +113,9 @@ def loadModelData(model, variable, test, **openDatasetKwargs):
     
     paths = getFilePaths(directory, filterTerm)
 
-    print(paths)
+    print("Files imported: \n",paths)
    
     if len(paths)==0:
         EnvironmentError("Files not found, possibly test name is wrong")
     
-    return xarray.open_mfdataset(paths, **openDatasetKwargs)
+    return xarray.open_mfdataset(paths, parallel=True, **openDatasetKwargs)
