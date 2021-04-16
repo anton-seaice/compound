@@ -36,7 +36,10 @@ def getFilePaths(directory, *args):
     if operatingSystem == 'Windows':
         directory = 'E:/CMIP5-PMIP3/' + directory
     elif operatingSystem == 'Darwin':
-        directory = '/Volumes/Untitled/CMIP5-PMIP3/'  + directory 
+        if directory == 'CESM-LME/mon/SST/':
+            directory = '/Users/ajs/CMIP5-PMIP3/CESM-LME/mon/SST/'
+        else:
+            directory = '/Volumes/Untitled/CMIP5-PMIP3/'  + directory 
     else:
         raise EnvironmentError("Can't find where to look for data files. Operating System is " + operatingSystem)
     
