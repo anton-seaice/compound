@@ -121,4 +121,6 @@ def loadModelData(model, variable, test, **openDatasetKwargs):
     if len(paths)==0:
         EnvironmentError("Files not found, possibly test name is wrong")
     
+    #At some point, it could be interesting to write this without dask. To do this you would open each file individually and then cat them. (Possible it would make sense to reduce their size first to)
+    
     return xarray.open_mfdataset(paths, parallel=True, **openDatasetKwargs)
