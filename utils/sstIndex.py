@@ -1,6 +1,27 @@
 import xarray
 
 
+def plotArea(ds) :
+    """
+        #Sanity check the area looks believable ?
+        nino34Slice = ds.isel(time=0) # select a slice
+
+        # -- plot the 'quick' way
+        plt.figure(figsize=(8,4))
+        ax = plt.axes(projection=ccrs.Robinson(central_longitude=160))  # set up projection
+        ax.set_global()
+
+        #sst2d.SST.plot.pcolormesh()
+
+        nino34Slice.SST.plot.pcolormesh(ax=ax, transform=ccrs.PlateCarree(), x='TLONG', y='TLAT', center=False, levels=35)
+
+
+        ax.coastlines()
+        ax.gridlines()
+        plt.show()"""
+    
+    return
+
 def calculateIndex(ds, index):
     """
     
@@ -22,6 +43,8 @@ def calculateIndex(ds, index):
     #Making TAREA a coordinate
     ds=ds.set_coords('TAREA')
     
+    resultDs = xarray.Dataset(coords={"time":ds.time})
+    
     for key in index:
 
         domain=index[key]
@@ -37,6 +60,22 @@ def calculateIndex(ds, index):
 
         #Then calculate a weighted mean
         #easternSstAv=(nino34.sstAnom*nino34.TAREA).sum(dim=('nlat','nlon'))/nino34.TAREA.sum()
-        ds[key]=domainDs.sstAnom.weighted(domainDs.TAREA).mean(dim=('nlon','nlat'))
-    
-    return ds
+        resultDs[key]=domainDs.sstAnom.weighted(domainDs.TAREA).mean(dim=('nlon','nlat'))
+        
+        """
+        #This could be an alternative way to calculate the area weighting
+        # Ref: http://xarray.pydata.org/en/stable/examples/area_weighted_temperature.html
+
+        nino34['weights']=numpy.cos(numpy.deg2rad(nino34.TLAT))
+
+        domainAreaTotal=nino34.weights.sum()
+
+        #domainAv=(nino34.sstAnom*nino34.weights).sum(dim=('nlat','nlon'))/domainAreaTotal
+
+        domainAv=nino34.sstAnom.weighted(nino34.weights).mean(dim=('nlon','nlat'))
+        """
+        
+    # Special case for iod
+    resultDs['iod'] = resultDs['westIO'] - resultDs['eastIO']
+       
+    return resultDs
