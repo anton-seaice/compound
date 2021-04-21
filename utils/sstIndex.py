@@ -1,5 +1,8 @@
 import xarray
 
+import sys
+sys.path.append('../')
+import utils._indexDefinitions as _index
 
 def plotArea(ds) :
     """
@@ -22,17 +25,24 @@ def plotArea(ds) :
     
     return
 
-def calculateIndex(ds, index):
+def calculateIndex(ds):
     """
+    This function calculates an area-average for the indeces specified in _indexDefitions based on monthly climatology.
     
+    inputs:
     
+    xarray ds in CESM format
     
+    output:
+    
+    new xarray with time dimension
+        
     """
 
     
     # For now, assume this is CESM output. Although CMIP should be principally the same non?
     
- 
+    index = _index.sstIndex
     
     #There's only one depth dimension, so we will drop that
     ds['SST']=ds.SST.isel(z_t=0)
@@ -47,9 +57,11 @@ def calculateIndex(ds, index):
     
     for key in index:
 
+        
+        #grad the area of interest for this index
         domain=index[key]
 
-        #Carve out the area of interest for nino 34
+        #Carve out the area of interest for this domain
         #https://www.cesm.ucar.edu/models/ccsm3.0/csim/RefGuide/ice_refdoc/node9.html describes TLAT/TLONG. They are in the middle of a grid square in the model.
         domainDs=ds.where((ds.TLAT>domain['latMin']) & (ds.TLAT<domain['latMax']) & (ds.TLONG>domain['longMin']) & (ds.TLONG<domain['longMax']), drop=True)
 
