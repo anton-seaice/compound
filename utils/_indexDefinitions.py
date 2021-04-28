@@ -8,3 +8,8 @@ sstIndex = {
     "westIO" : {"latMin":-10, "latMax":10, "longMin":50,"longMax":70},
     "eastIO" : {"latMin":-10, "latMax":0, "longMin":90,"longMax":110}
 } 
+
+
+pslIndex = {
+    "sam" : {}
+}

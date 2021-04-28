@@ -67,7 +67,7 @@ def calculateIndex(ds):
 
         # First calculate SST Anomalies based on
         # climatology = "850-2005 climatology removed prior to all calculations (other than means)";
-        domainSst=domainDs.SST.groupby('time.month')    
+        domainSst=domainDs.SST.groupby('time.month', restore_coord_dims=True)    
         domainDs['sstAnom']=domainSst-domainSst.mean(dim='time')
 
         #Then calculate a weighted mean
@@ -88,6 +88,6 @@ def calculateIndex(ds):
         """
         
     # Special case for iod
-    resultDs['iod'] = resultDs['westIO'] - resultDs['eastIO']
+    resultDs['indian_ocean_dipole'] = resultDs['westIO'] - resultDs['eastIO']
        
     return resultDs
