@@ -103,7 +103,7 @@ def loadModelData(model, variable, test, **openDatasetKwargs):
     
     if model=='CESM-LME' :
         #exampleFilterTerm = 'b\.e11\.BLMTRC5CN\.f19_g16.001\.pop\.h\.SST\..+\.nc'
-        filterTerm = 'b\.e11\.BLMTRC5CN\.f19_g16\.' + test + '\..*?' + variable + '\..+\.nc'
+        filterTerm = 'b\.e11\.B.*?\.f19_g16\.' + test + '\..*?' + variable + '\..+\.nc'
         
         regex=re.compile('cvdp')
         
