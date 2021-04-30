@@ -3,6 +3,7 @@ sys.path.append('../')
 import utils._indexDefinitions as _index
 
 import cftime
+import xarray
 
 def normalisePSL(x, climatStart, climatFinish):
     """This function calculates a normalised (by month) PSL for the provided range of years.
@@ -37,7 +38,9 @@ def calculateSamIndex(ds, climatStart, climatFinish):
     
     ds40=ds.sel(lat=domain['lat1'],method='nearest', drop=True).mean(dim='lon')
     ds65=ds.sel(lat=domain['lat2'],method='nearest', drop=True).mean(dim='lon')
-    samIndex=normalisePSL(ds40,climatStart, climatFinish)-normalisePSL(ds65,climatStart, climatFinish)
-    samIndex.rename('sam')
+    
+    samIndex=xarray.Dataset(coords={"time":ds.time})
+    
+    samIndex['sam']=normalisePSL(ds40,climatStart, climatFinish)-normalisePSL(ds65,climatStart, climatFinish)
     
     return samIndex
