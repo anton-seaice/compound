@@ -6,10 +6,10 @@ sstIndex = {
     "nino34" : {"latMin":-5, "latMax":5, "longMin":190,"longMax":240},
     "nino4" : {"latMin":-5, "latMax":5, "longMin":160,"longMax":210},
     "westIO" : {"latMin":-10, "latMax":10, "longMin":50,"longMax":70},
-    "eastIO" : {"latMin":-10, "latMax":0, "longMin":90,"longMax":110}
+    "eastIO" : {"latMin":-10, "latMax":0, "longMin":90,"longMax":110}, 
 } 
 
 
 pslIndex = {
-    "sam" : {}
+    "sam" : {"lat1":-65, "lat2":-40} 
 }

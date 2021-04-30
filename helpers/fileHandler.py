@@ -13,7 +13,12 @@ from platform import system
 #Import logging
 import logging
 
+# Import cvdp time function
+import sys
+sys.path.append('../')
+import helpers.cvdpTime as cvdpTime
 
+import pandas
 
 def getFilePaths(directory, *args):
     """Returns a list of absolute paths from a chosen directory
@@ -101,26 +106,53 @@ def loadModelData(model, variable, test, **openDatasetKwargs):
     
     """
     
+    #First we are going to make some file paths from the information provided.
+    
+    #make a regex to compare the variable name against, as cvdp is a special case.
+    regex=re.compile('cvdp')
+    
     if model=='CESM-LME' :
+        #for CESM, make a filter term for file names, and make a directory
         #exampleFilterTerm = 'b\.e11\.BLMTRC5CN\.f19_g16.001\.pop\.h\.SST\..+\.nc'
         filterTerm = 'b\.e11\.B.*?\.f19_g16\.' + test + '\..*?' + variable + '\..+\.nc'
-        
-        regex=re.compile('cvdp')
-        
+         
         if regex.search(variable):
+            #for cvdp, special case
             directory = constructDirectoryPath('CESM-LME', 'CVDP')
         else :
+            #for normal experiments
             directory = constructDirectoryPath('CESM-LME', 'MON', variable)
     else:
+        #otherwise we are just going to throw an error
         raise EnvironmentError("Selected model not supported, please add to file handler")  
-    
-    paths = getFilePaths(directory, filterTerm)
 
-    print("Files imported: \n",paths)
+        
+    #get an array of paths for that filer term and directory    
+    paths = getFilePaths(directory, filterTerm)
    
+    # throw an error if we didn't find any files
     if len(paths)==0:
         EnvironmentError("Files not found, possibly test name is wrong")
     
+    
+    
+    
     #At some point, it could be interesting to write this without dask. To do this you would open each file individually and then cat them. (Possible it would make sense to reduce their size first to)
     
-    return xarray.open_mfdataset(paths, parallel=True, **openDatasetKwargs)
+
+    if model == 'CESM-LME':
+        if regex.search(variable):
+            #special case for cvdp, as the times are really weird
+            result = xarray.open_mfdataset(paths, decode_times=False, **openDatasetKwargs)
+            result = cvdpTime.decodeTime(result)
+        else:
+            #special case for CESM, as the dates are one day later then you expect. (i.e. the average for the first month of 850 is associated with the time co-ord of 1-Feb-850)
+            result = xarray.open_mfdataset(paths, **openDatasetKwargs)
+            result['time'] = result['time']-pandas.to_timedelta(1, unit='d')
+    else:
+        # basically a place holder for other model types.
+        result = xarray.open_mfdataset(paths, **openDatasetKwargs)
+    
+    print("Files imported: \n",paths)
+    
+    return result

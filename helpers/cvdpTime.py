@@ -25,7 +25,7 @@ def decodeTime(ds):
         nPeriods=len(ds.time)
         
         # Create an xarray of cftime.datetime objects
-        dates = xarray.cftime_range(start="0850-01-15", periods=nPeriods, freq="MS", calendar="noleap")
+        dates = xarray.cftime_range(start="0850-01-15", periods=nPeriods, freq="M", calendar="noleap")
        
     # Assign the new array to the time coordinate
     ds=ds.assign_coords(time=("time",dates))

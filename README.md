@@ -14,5 +14,6 @@ cartopy
 
 Useful git commands:
 
+normal commit: git commit -m "message", git add
 add changed files only: git add -u
 tagging: git tag v1.0 ; git push --tags
