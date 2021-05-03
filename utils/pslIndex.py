@@ -23,7 +23,10 @@ def normalisePSL(x, climatStart, climatFinish):
     
     # Calculate the climatology for the provided years
     xClimatology=x.PSL.sel(
-        time=slice(cftime.DatetimeNoLeap(climatStart,1,1),cftime.DatetimeNoLeap(climatFinish,12,1))
+        time=slice(
+            cftime.DatetimeNoLeap(climatStart,1,1),
+            cftime.DatetimeNoLeap(climatFinish,12,1)
+        )
         ).groupby('time.month')
     
     # Use the calculated climatology to calculate the anomaly and the standard deviation
