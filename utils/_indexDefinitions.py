@@ -20,7 +20,7 @@ monthsOfInterest = {
     "nino34" : [7,15] ,
     "nino4" : [7,15] ,
     "westIO" : [7,12] ,
-    "eastIO" : [7,15] , 
+    "eastIO" : [7,12] , 
     "indian_ocean_dipole": [7,15] ,
     "sam" : [10, 15]
 }
