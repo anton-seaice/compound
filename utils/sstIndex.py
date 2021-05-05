@@ -77,7 +77,7 @@ def calculateIndex(ds, climatStart, climatFinish):
             'time.month', restore_coord_dims=True
         )
             
-        domainDs['sstAnom']=domainSst-domainSst.mean(dim='time')
+        domainDs['sstAnom']=domainDs.SST.groupby('time.month', restore_coord_dims=True        )-domainSst.mean(dim='time')
 
         #Then calculate a weighted mean
         #easternSstAv=(nino34.sstAnom*nino34.TAREA).sum(dim=('nlat','nlon'))/nino34.TAREA.sum()
