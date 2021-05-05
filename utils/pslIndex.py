@@ -25,7 +25,7 @@ def normalisePSL(x, climatStart, climatFinish):
     xClimatology=x.PSL.sel(
         time=slice(
             cftime.DatetimeNoLeap(climatStart,1,1),
-            cftime.DatetimeNoLeap(climatFinish,12,1)
+            cftime.DatetimeNoLeap(climatFinish+1,1,1)
         )
         ).groupby('time.month')
     

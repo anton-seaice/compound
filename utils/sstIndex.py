@@ -1,4 +1,5 @@
 import xarray
+import cftime
 
 import sys
 sys.path.append('../')
@@ -25,7 +26,7 @@ def plotArea(ds) :
     
     return
 
-def calculateIndex(ds):
+def calculateIndex(ds, climatStart, climatFinish):
     """
     This function calculates an area-average for the indeces specified in _indexDefitions based on monthly climatology.
     
@@ -67,7 +68,15 @@ def calculateIndex(ds):
 
         # First calculate SST Anomalies based on
         # climatology = "850-2005 climatology removed prior to all calculations (other than means)";
-        domainSst=domainDs.SST.groupby('time.month', restore_coord_dims=True)    
+        domainSst=domainDs.sel(
+            time=slice(
+                cftime.DatetimeNoLeap(climatStart,1,1),
+                cftime.DatetimeNoLeap(climatFinish+1,1,1)
+            )
+        ).SST.groupby(
+            'time.month', restore_coord_dims=True
+        )
+            
         domainDs['sstAnom']=domainSst-domainSst.mean(dim='time')
 
         #Then calculate a weighted mean
