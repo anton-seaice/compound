@@ -97,6 +97,6 @@ def calculateIndex(ds, climatStart, climatFinish):
         """
         
     # Special case for iod
-    resultDs['indian_ocean_dipole'] = resultDs['westIO'] - resultDs['eastIO']
+    resultDs['dmi'] = resultDs['westIO'] - resultDs['eastIO']
        
     return resultDs

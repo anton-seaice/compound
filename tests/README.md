@@ -7,7 +7,7 @@ file Handling and Import:
 
 testFileHandler.ipnyb
 testCesmLoad.ipnyb
-TestCvdpTime.ipnyb
+testCvdpTime.ipnyb
 
 calculating indeces:
 
