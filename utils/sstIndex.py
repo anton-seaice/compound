@@ -4,6 +4,8 @@ import cftime
 import sys
 sys.path.append('../')
 import utils._indexDefinitions as _index
+import utils.climatology as climat
+
 
 def plotArea(ds) :
     """
@@ -68,12 +70,7 @@ def calculateIndex(ds, climatStart, climatFinish):
 
         # First calculate SST Anomalies based on
         # climatology = "850-2005 climatology removed prior to all calculations (other than means)";
-        domainSst=domainDs.sel(
-            time=slice(
-                cftime.DatetimeNoLeap(climatStart,1,1),
-                cftime.DatetimeNoLeap(climatFinish+1,1,1)
-            )
-        ).SST.groupby(
+        domainSst=climat.dateInterval(domainDs.SST, climatStart,climatFinish).groupby(
             'time.month', restore_coord_dims=True
         )
             

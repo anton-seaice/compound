@@ -19,7 +19,6 @@ import cftime
 import pandas
 
 
-# In[3]:
 
 
 def averageForTimePeriod(indexXr):
@@ -73,7 +72,6 @@ def averageForTimePeriod(indexXr):
     
 
 
-# In[ ]:
 
 
 
