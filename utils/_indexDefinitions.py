@@ -1,4 +1,5 @@
 
+# This dict is a container for the areas to calculate SST anomalies for when calculting SST indeces
 
 sstIndex = {
     "nino12" : {"latMin":-10, "latMax":0, "longMin":270,"longMax":280} ,
@@ -6,14 +7,15 @@ sstIndex = {
     "nino34" : {"latMin":-5, "latMax":5, "longMin":190,"longMax":240},
     "nino4" : {"latMin":-5, "latMax":5, "longMin":160,"longMax":210},
     "westIO" : {"latMin":-10, "latMax":10, "longMin":50,"longMax":70},
-    "eastIO" : {"latMin":-10, "latMax":0, "longMin":90,"longMax":110}, 
+    "eastIO" : {"latMin":-10, "latMax":0, "longMin":90,"longMax":110}, # This is the 'traditional/Saji area'
 } 
 
-
+# This is the latitudes to use for sam calculations
 pslIndex = {
     "sam" : {"lat1":-65, "lat2":-40} 
 }
 
+# This is the months of interest for each index when calculating warm-season averages
 monthsOfInterest = {
     "nino12" :  [7,15] ,
     "nino3" :[7,15] ,
@@ -24,3 +26,9 @@ monthsOfInterest = {
     "dmi": [7,15] ,
     "sam" : [10, 15]
 }
+
+# This is the list of indices which are fire promoting when positive in the warm-season
+firePos = ['nino34', 'nino4', 'dmi' ]
+
+# This is indices which are fire promiting when negative in the warm-seaonon
+fireNeg = ['sam']

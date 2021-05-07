@@ -1,19 +1,15 @@
 import cftime
 import xarray
 
-
-
 def dateInterval(x, climatStart, climatFinish):
-
-    
     # Calculate the climatology for the provided years
+    # Output is a new xarray ds slices by the year range provided.
     xClimatology=x.sel(
         time=slice(
             cftime.DatetimeNoLeap(climatStart,1,1),
             cftime.DatetimeNoLeap(climatFinish+1,1,1)
         )
         )     
-    
     return xClimatology
 
 def normalise(x, xClimatology):
@@ -28,9 +24,9 @@ def normalise(x, xClimatology):
     
     # First group into months
     xMonthly=x.groupby('time.month')
-
+    
     # Use the calculated climatology to calculate the anomaly and the standard deviation
-    xAnom=(xMonthly-xClimatology.mean(dim='time')).groupby('time.month')
-    xStd=xClimatology.std(dim='time')
+    xAnom=(xMonthly-xClimatology.groupby('time.month').mean(dim='time')).groupby('time.month')
+    xStd=xClimatology.groupby('time.month').std(dim='time')
     
     return xAnom/xStd
