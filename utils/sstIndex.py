@@ -7,6 +7,21 @@ import utils._indexDefinitions as _index
 import utils.climatology as climat
 
 
+def sstDomain(ds, indexKey):
+    
+    #grab the area of interest for this index
+    domain=_index.sstIndex[indexKey]
+
+    #ADD RANGE CHECKING!
+    
+    #Carve out the area of interest for this index
+    #https://www.cesm.ucar.edu/models/ccsm3.0/csim/RefGuide/ice_refdoc/node9.html describes TLAT/TLONG. They are in the middle of a grid square in the model.
+    domainDs=ds.where(
+        (ds.TLAT>domain['latMin']) & (ds.TLAT<domain['latMax']) & (ds.TLONG>domain['longMin']) & (ds.TLONG<domain['longMax']),
+        drop=True
+    ).SST
+
+    return domainDs
 
 def calculateIndex(ds, climatStart, climatFinish):
     """
@@ -43,18 +58,10 @@ def calculateIndex(ds, climatStart, climatFinish):
     #for every index name
     for key in index:
         
-        #grab the area of interest for this index
-        domain=index[key]
-
-        #Carve out the area of interest for this index
-        #https://www.cesm.ucar.edu/models/ccsm3.0/csim/RefGuide/ice_refdoc/node9.html describes TLAT/TLONG. They are in the middle of a grid square in the model.
-        domainDs=ds.where(
-            (ds.TLAT>domain['latMin']) & (ds.TLAT<domain['latMax']) & (ds.TLONG>domain['longMin']) & (ds.TLONG<domain['longMax']),
-            drop=True
-        ).SST
+        domainDs=sstDomain(ds, key)
 
         # First calculate the data range to use for climatology 
-        domainSstClimat=climat.dateInterval(domainDs, climatStart,climatFinish)
+        domainSstClimat=climat.dateInterval(domainDs, climatStart, climatFinish)
         
         #calculate the monthly means of that range
         sstMean = domainSstClimat.groupby('time.month', restore_coord_dims=True).mean(dim='time')
@@ -70,6 +77,10 @@ def calculateIndex(ds, climatStart, climatFinish):
                 
     # Special case for iod
     resultDs['dmi'] = resultDs['westIO'] - resultDs['eastIO']
+    
+        #for every index name
+    for key in index:
+        resultDs[key+'Detrend'] = resultDs[key] - resultDs['backgroundSst']
        
     return resultDs
 

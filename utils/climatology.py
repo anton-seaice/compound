@@ -27,12 +27,13 @@ def normalise(x, xClimatology):
     xClimatology is the xarray of the time range to use for climatology
        
     """
+    xMonthly = x.groupby('time.month')
     
-    # First group into months
-    xMonthly=x.groupby('time.month')
-    
+    xClimatologyMean = xClimatology.groupby('time.month').mean(dim='time')
+   
     # Use the calculated climatology to calculate the anomaly and the standard deviation
-    xAnom=(xMonthly-xClimatology.groupby('time.month').mean(dim='time')).groupby('time.month')
+    xAnom=(xMonthly-xClimatologyMean)
     xStd=xClimatology.groupby('time.month').std(dim='time')
     
-    return xAnom/xStd
+    
+    return xAnom.groupby('time.month')/xStd

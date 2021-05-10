@@ -36,9 +36,9 @@ def calculateSamIndex(ds, climatStart, climatFinish):
     ds65=ds.sel(lat=domain['lat2'],method='nearest', drop=True).PSL.mean(dim='lon')
     
     #filter by the climatology
-    ds40Climatology = climat.dateInterval(ds40, climatStart, climatFinish).groupby('time.month')
+    ds40Climatology = climat.dateInterval(ds40, climatStart, climatFinish)
     #filter by the climatology
-    ds65Climatology = climat.dateInterval(ds65, climatStart, climatFinish).groupby('time.month')
+    ds65Climatology = climat.dateInterval(ds65, climatStart, climatFinish)
     
     #normalise each latitude using these climatologies and calculate the difference
     samIndex['sam']=climat.normalise(ds40,ds40Climatology)-climat.normalise(ds65,ds65Climatology)

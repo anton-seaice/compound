@@ -7,12 +7,13 @@ sstIndex = {
     "nino34" : {"latMin":-5, "latMax":5, "longMin":190,"longMax":240},
     "nino4" : {"latMin":-5, "latMax":5, "longMin":160,"longMax":210},
     "westIO" : {"latMin":-10, "latMax":10, "longMin":50,"longMax":70},
-    "eastIO" : {"latMin":-10, "latMax":0, "longMin":90,"longMax":110}, # This is the 'traditional/Saji area'
+    "eastIO" : {"latMin":-10, "latMax":0, "longMin":90,"longMax":110},  # This is the 'traditional/Saji area'
+    "backgroundSst" : {"latMin":-20, "latMax":20, "longMin":0,"longMax":360} #might use to detrend indeces
 } 
 
 # This is the latitudes to use for sam calculations
 pslIndex = {
-    "sam" : {"lat1":-65, "lat2":-40} 
+    "sam" : {"lat1":-40, "lat2":-65} 
 }
 
 # This is the months of interest for each index when calculating warm-season averages
