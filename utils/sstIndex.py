@@ -7,26 +7,6 @@ import utils._indexDefinitions as _index
 import utils.climatology as climat
 
 
-def plotArea(ds) :
-    """
-        #Sanity check the area looks believable ?
-        nino34Slice = ds.isel(time=0) # select a slice
-
-        # -- plot the 'quick' way
-        plt.figure(figsize=(8,4))
-        ax = plt.axes(projection=ccrs.Robinson(central_longitude=160))  # set up projection
-        ax.set_global()
-
-        #sst2d.SST.plot.pcolormesh()
-
-        nino34Slice.SST.plot.pcolormesh(ax=ax, transform=ccrs.PlateCarree(), x='TLONG', y='TLAT', center=False, levels=35)
-
-
-        ax.coastlines()
-        ax.gridlines()
-        plt.show()"""
-    
-    return
 
 def calculateIndex(ds, climatStart, climatFinish):
     """
@@ -35,7 +15,7 @@ def calculateIndex(ds, climatStart, climatFinish):
     inputs:
     
     xarray ds in CESM format
-    start and finish years to use a climatology
+    start and finish years to use for climatology
     
     output:
     
@@ -92,3 +72,25 @@ def calculateIndex(ds, climatStart, climatFinish):
     resultDs['dmi'] = resultDs['westIO'] - resultDs['eastIO']
        
     return resultDs
+
+
+def plotArea(ds) :
+    """
+        #Sanity check the area looks believable ?
+        nino34Slice = ds.isel(time=0) # select a slice
+
+        # -- plot the 'quick' way
+        plt.figure(figsize=(8,4))
+        ax = plt.axes(projection=ccrs.Robinson(central_longitude=160))  # set up projection
+        ax.set_global()
+
+        #sst2d.SST.plot.pcolormesh()
+
+        nino34Slice.SST.plot.pcolormesh(ax=ax, transform=ccrs.PlateCarree(), x='TLONG', y='TLAT', center=False, levels=35)
+
+
+        ax.coastlines()
+        ax.gridlines()
+        plt.show()"""
+    
+    return

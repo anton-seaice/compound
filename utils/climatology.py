@@ -2,8 +2,14 @@ import cftime
 import xarray
 
 def dateInterval(x, climatStart, climatFinish):
-    # Calculate the climatology for the provided years
-    # Output is a new xarray ds slices by the year range provided.
+    """Return an xarray sliced by the year range provided
+    
+    Inputs:
+    x : an xarray ds/da
+    climatStart: the start year
+    climatFInish: the finish year
+    
+    """
     xClimatology=x.sel(
         time=slice(
             cftime.DatetimeNoLeap(climatStart,1,1),
