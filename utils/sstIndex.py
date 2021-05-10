@@ -35,6 +35,7 @@ def calculateIndex(ds, climatStart, climatFinish):
     inputs:
     
     xarray ds in CESM format
+    start and finish years to use a climatology
     
     output:
     
@@ -44,7 +45,7 @@ def calculateIndex(ds, climatStart, climatFinish):
 
     
     # For now, assume this is CESM output. Although CMIP should be principally the same non?
-    
+    #list of index names, as defined in _indexDefitions file
     index = _index.sstIndex
     
     #There's only one depth dimension, so we will drop that
@@ -56,43 +57,37 @@ def calculateIndex(ds, climatStart, climatFinish):
     #Making TAREA a coordinate
     ds=ds.set_coords('TAREA')
     
+    #Create a dataset to add the results to
     resultDs = xarray.Dataset(coords={"time":ds.time})
     
+    #for every index name
     for key in index:
-
         
-        #grad the area of interest for this index
+        #grab the area of interest for this index
         domain=index[key]
 
-        #Carve out the area of interest for this domain
+        #Carve out the area of interest for this index
         #https://www.cesm.ucar.edu/models/ccsm3.0/csim/RefGuide/ice_refdoc/node9.html describes TLAT/TLONG. They are in the middle of a grid square in the model.
-        domainDs=ds.where((ds.TLAT>domain['latMin']) & (ds.TLAT<domain['latMax']) & (ds.TLONG>domain['longMin']) & (ds.TLONG<domain['longMax']), drop=True)
+        domainDs=ds.where(
+            (ds.TLAT>domain['latMin']) & (ds.TLAT<domain['latMax']) & (ds.TLONG>domain['longMin']) & (ds.TLONG<domain['longMax']),
+            drop=True
+        ).SST
 
-        # First calculate SST Anomalies based on
-        # climatology = "850-2005 climatology removed prior to all calculations (other than means)";
-        domainSst=climat.dateInterval(domainDs.SST, climatStart,climatFinish).groupby(
+        # First calculate the data range to use for climatology 
+        domainSstClimat=climat.dateInterval(domainDs, climatStart,climatFinish)
+        
+        #calculate the monthly means of that range
+        sstMean = domainSstClimat.groupby('time.month', restore_coord_dims=True).mean(dim='time')
+           
+        # caluclate the sst anomolies 
+        domainDs['sstAnom']=domainDs.groupby(
             'time.month', restore_coord_dims=True
-        )
-            
-        domainDs['sstAnom']=domainDs.SST.groupby('time.month', restore_coord_dims=True        )-domainSst.mean(dim='time')
+        )-sstMean
 
         #Then calculate a weighted mean
         #easternSstAv=(nino34.sstAnom*nino34.TAREA).sum(dim=('nlat','nlon'))/nino34.TAREA.sum()
         resultDs[key]=domainDs.sstAnom.weighted(domainDs.TAREA).mean(dim=('nlon','nlat'))
-        
-        """
-        #This could be an alternative way to calculate the area weighting
-        # Ref: http://xarray.pydata.org/en/stable/examples/area_weighted_temperature.html
-
-        nino34['weights']=numpy.cos(numpy.deg2rad(nino34.TLAT))
-
-        domainAreaTotal=nino34.weights.sum()
-
-        #domainAv=(nino34.sstAnom*nino34.weights).sum(dim=('nlat','nlon'))/domainAreaTotal
-
-        domainAv=nino34.sstAnom.weighted(nino34.weights).mean(dim=('nlon','nlat'))
-        """
-        
+                
     # Special case for iod
     resultDs['dmi'] = resultDs['westIO'] - resultDs['eastIO']
        
