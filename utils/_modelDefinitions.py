@@ -6,4 +6,4 @@ cesmCntl = ['0850cntl.001']
 
 cesmRcp85 = ['LME.002', 'LME.003', 'LME.008', 'LME.009']
 
-cesmAll = [*cesmCntl, *cesmRcp85, *cesmFullForcings]
+cesmAll = [*cesmRcp85, *cesmFullForcings]

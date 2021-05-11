@@ -121,11 +121,11 @@ def calculateIndex(ds, *args):
         resultDs[key+'NoDetrend']=domainDs.sstAnom.weighted(domainDs.TAREA).mean(dim=('nlon','nlat'))
                 
     # Special case for iod
-    resultDs['dmi'] = resultDs['westIO'] - resultDs['eastIO']
+    resultDs['dmi'] = resultDs['westIONoDetrend'] - resultDs['eastIONoDetrend']
     
         #for every index name, calculate a detrended version too
     for key in index:
-        resultDs[key] = resultDs[key+'NoDetrend'] - resultDs['backgroundSst']
+        resultDs[key] = resultDs[key+'NoDetrend'] - resultDs['backgroundSstNoDetrend']
        
     return resultDs
 
