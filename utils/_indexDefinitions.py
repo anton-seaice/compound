@@ -18,18 +18,22 @@ pslIndex = {
 
 # This is the months of interest for each index when calculating warm-season averages
 monthsOfInterest = {
-    "nino12" :  [7,15] ,
-    "nino3" :[7,15] ,
+#    "nino12" :  [7,15] ,
+#    "nino3" :[7,15] ,
+    "nino34NoDetrend" : [7,15] ,
+    "nino4NoDetrend" : [7,15] ,
+    "westIONoDetrend" : [7,12] ,
+    "eastIONoDetrend" : [7,12] , 
+    "dmi": [7,15] ,
     "nino34" : [7,15] ,
     "nino4" : [7,15] ,
     "westIO" : [7,12] ,
     "eastIO" : [7,12] , 
-    "dmi": [7,15] ,
     "sam" : [10, 15]
 }
 
 # This is the list of indices which are fire promoting when positive in the warm-season
-firePos = ['nino34', 'nino4', 'dmi' ]
+firePos = ['nino34', 'nino4', 'dmi', 'nino34NoDetrend', 'nino4NoDetrend', 'nino34Detrend', 'nino4Detrend' ]
 
 # This is indices which are fire promiting when negative in the warm-seaonon
 fireNeg = ['sam']

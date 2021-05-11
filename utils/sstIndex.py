@@ -83,8 +83,9 @@ def calculateIndex(ds, *args):
     #There's only one depth dimension, so we will drop that
     ds['SST']=ds.SST.isel(z_t=0)
 
-    #For some reason TAREA has a time dimension, but doesn't change in time, so well drop that too
-    ds['TAREA']=ds.TAREA.isel(time=0)
+    if ds.TAREA.dims=='time':
+        #For some reason TAREA has a time dimension (possible from opening multiple files), but doesn't change in time, so well drop that too
+        ds['TAREA']=ds.TAREA.isel(time=0)
 
     #Making TAREA a coordinate
     ds=ds.set_coords('TAREA')
@@ -117,14 +118,14 @@ def calculateIndex(ds, *args):
 
         #Then calculate a weighted mean
         #easternSstAv=(nino34.sstAnom*nino34.TAREA).sum(dim=('nlat','nlon'))/nino34.TAREA.sum()
-        resultDs[key]=domainDs.sstAnom.weighted(domainDs.TAREA).mean(dim=('nlon','nlat'))
+        resultDs[key+'NoDetrend']=domainDs.sstAnom.weighted(domainDs.TAREA).mean(dim=('nlon','nlat'))
                 
     # Special case for iod
     resultDs['dmi'] = resultDs['westIO'] - resultDs['eastIO']
     
         #for every index name, calculate a detrended version too
     for key in index:
-        resultDs[key+'Detrend'] = resultDs[key] - resultDs['backgroundSst']
+        resultDs[key] = resultDs[key+'NoDetrend'] - resultDs['backgroundSst']
        
     return resultDs
 

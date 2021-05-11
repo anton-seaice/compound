@@ -41,10 +41,7 @@ def getFilePaths(directory, *args):
     if operatingSystem == 'Windows':
         directory = 'E:/CMIP5-PMIP3/' + directory
     elif operatingSystem == 'Darwin':
-        if directory == 'CESM-LME/mon/SST/':
-            directory = '/Users/ajs/CMIP5-PMIP3/CESM-LME/mon/SST/'
-        else:
-            directory = '/Volumes/Untitled/CMIP5-PMIP3/'  + directory 
+        directory = '/Volumes/Untitled/CMIP5-PMIP3/'  + directory 
     else:
         raise EnvironmentError("Can't find where to look for data files. Operating System is " + operatingSystem)
     
@@ -126,17 +123,19 @@ def loadModelData(model, variable, test, **openDatasetKwargs):
         #otherwise we are just going to throw an error
         raise EnvironmentError("Selected model not supported, please add to file handler")  
 
-        
+    print(directory)
+    print(filterTerm)
     #get an array of paths for that filer term and directory    
     paths = getFilePaths(directory, filterTerm)
-   
+    
+    print(paths)
+    print(len(paths))
+    print(len(paths)==0)
     # throw an error if we didn't find any files
     if len(paths)==0:
-        EnvironmentError("Files not found, possibly test name is wrong")
+        raise EnvironmentError("Files not found, possibly test name is wrong")
     
-    
-    
-    
+    print(paths)
     #At some point, it could be interesting to write this without dask. To do this you would open each file individually and then cat them. (Possible it would make sense to reduce their size first to)
     
 

@@ -34,11 +34,6 @@ def averageForTimePeriod(indexXr):
     lastYear = indexXr.time[-1].dt.year
     yearRange = numpy.arange(indexXr.time[0].dt.year,indexXr.time[-1].dt.year)
     
-   
-
-    #get a list of index names to iterate, 
-    indexNames = list(_index.monthsOfInterest.keys())
-
     #ds = xarray.Dataset()
     results = pandas.DataFrame(index=yearRange)
     results.index.name='year'
@@ -53,15 +48,19 @@ def averageForTimePeriod(indexXr):
         # if the period is within one year
         if months[1]<12:
             for year in yearRange:
-                periodOfInterest=xarray.cftime_range(start=cftime.DatetimeNoLeap(year,months[0],1), 
-                    end= cftime.DatetimeNoLeap(year,months[1]+1,1), 
+                periodOfInterest=xarray.cftime_range(
+                    start=cftime.DatetimeNoLeap(year,months[0],1), 
+                    end= cftime.DatetimeNoLeap(year,months[1]+1,
+                                               1), 
                                                      freq='M')
                 answer.append(float(indexXr[keys].sel(time=periodOfInterest).mean().values))
         # if the period goes over two years
         else:
             for year in yearRange:
-                periodOfInterest=xarray.cftime_range(start=cftime.DatetimeNoLeap(year,months[0],1), 
-                    end= cftime.DatetimeNoLeap(year+1,months[1]-12+1,1), 
+                periodOfInterest=xarray.cftime_range(
+                    start=cftime.DatetimeNoLeap(year,months[0],1), 
+                    end= cftime.DatetimeNoLeap(year+1,months[1]-12+1,
+                                               1), 
                                                      freq='M')
                 answer.append(float(indexXr[keys].sel(time=periodOfInterest).mean().values))
         
