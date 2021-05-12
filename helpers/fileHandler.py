@@ -91,15 +91,14 @@ def constructDirectoryPath(model, outputType, *args):
     
     return directory
 
-def loadModelData(model, variable, test, **openDatasetKwargs):
+def loadModelData(model, variable, test):
     """Loads data for the chosen model (CESM-LME is supported)
     
     
     model = 'CESM-LME'
     variable = folder name for that variable, or 'cvdp_data' if desired
     test = name of model run, e.g. '001', or 'ORBITAL.003'
-    keyword arguments are passted to the Xarray mfopen dataset (most likely to use decode_times=False, otherwise look at open_mfdataset documentation)
-    
+     
     
     """
     
@@ -129,22 +128,19 @@ def loadModelData(model, variable, test, **openDatasetKwargs):
     # throw an error if we didn't find any files
     if len(paths)==0:
         raise EnvironmentError("Files not found, possibly test name is wrong")
-    
-    #At some point, it could be interesting to write this without dask. To do this you would open each file individually and then cat them. (Possible it would make sense to reduce their size first to)
-    
 
     if model == 'CESM-LME':
         if regex.search(variable):
             #special case for cvdp, as the times are really weird
-            result = xarray.open_mfdataset(paths, decode_times=False, **openDatasetKwargs)
+            result = xarray.open_mfdataset(paths, decode_times=False)
             result = cvdpTime.decodeTime(result)
         else:
             #special case for CESM, as the dates are one day later then you expect. (i.e. the average for the first month of 850 is associated with the time co-ord of 1-Feb-850)
-            result = xarray.open_mfdataset(paths, **openDatasetKwargs)
+            result = xarray.open_mfdataset(paths)
             result['time'] = result['time']-pandas.to_timedelta(1, unit='d')
     else:
         # basically a place holder for other model types.
-        result = xarray.open_mfdataset(paths, **openDatasetKwargs)
+        result = xarray.open_mfdataset(paths)
     
     print("Files imported: \n",paths)
     
