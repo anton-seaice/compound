@@ -22,18 +22,27 @@ monthsOfInterest = {
 #    "nino3" :[7,15] ,
     "nino34NoDetrend" : [7,15] ,
     "nino4NoDetrend" : [7,15] ,
-    "westIONoDetrend" : [7,12] ,
+    #"westIONoDetrend" : [7,12] ,
     "eastIONoDetrend" : [7,12] , 
     "dmi": [7,15] ,
     "nino34" : [7,15] ,
     "nino4" : [7,15] ,
-    "westIO" : [7,12] ,
+    #"westIO" : [7,12] ,
     "eastIO" : [7,12] , 
     "sam" : [10, 15]
 }
 
 # This is the list of indices which are fire promoting when positive in the warm-season
-firePos = ['nino34', 'nino4', 'dmi', 'nino34NoDetrend', 'nino4NoDetrend', 'nino34Detrend', 'nino4Detrend' ]
+firePos = ['nino34', 'nino4', 'dmi', 'nino34NoDetrend', 'nino4NoDetrend' ]
 
 # This is indices which are fire promiting when negative in the warm-seaonon
 fireNeg = ['sam']
+
+# List of indices we could use for ENSO
+enso = ['nino3', 'nino34', 'nino4', 'nino3NoDetrend', 'nino34NoDetrend', 'nino4NoDetrend']
+
+# Indices we might use for IOD
+iod = ['dmi', 'eastIO', 'eastIONoDetrend']
+
+# Indices we might use for SAM
+sam = ['sam']
