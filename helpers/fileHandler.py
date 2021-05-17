@@ -89,7 +89,7 @@ def constructDirectoryPath(model, outputType, *args):
             directory = 'CESM-LME/mon/' + args[0] + '/'
     else:
         if outputType == 'CVDP':
-            directory = 'cmip5.'+model+'.cvdp_data'
+            directory = 'cmip5.'+ args[0] +'.cvdp_data/'
         else:
             directory = model + '/' + args[0] + '/'
        
@@ -97,7 +97,7 @@ def constructDirectoryPath(model, outputType, *args):
     
     return directory
 
-def loadModelData(model, variable, *args):
+def loadModelData(model, variable, test):
     """Loads data for the chosen model (CESM-LME is supported)
     
     
@@ -107,9 +107,6 @@ def loadModelData(model, variable, *args):
      
     
     """
-    
-    if len(args)==1:
-        test=args[0]
     
     #make a regex to compare the variable name against, as cvdp is a special case.
     cvdpRegex=re.compile('cvdp')
@@ -130,8 +127,9 @@ def loadModelData(model, variable, *args):
     
     #CVDP for other models (CMIP5)
     elif cvdpRegex.search(variable):
-            #for cvdp, special case
-            directory = constructDirectoryPath(model, 'CVDP',)
+        #for cvdp, special case
+        filterTerm = model+'\.cvdp_data\..*\.nc'
+        directory = constructDirectoryPath(model, 'CVDP', test)
     
     #other cmip5
     elif test=='past1000' or test=='historical' or test=='piControl':
@@ -152,12 +150,12 @@ def loadModelData(model, variable, *args):
     if len(paths)==0:
         raise EnvironmentError("Files not found, possibly test name is wrong")
 
-    if model == 'CESM-LME':
-        if regex.search(variable):
-            #special case for cvdp, as the times are really weird
-            result = xarray.open_mfdataset(paths, decode_times=False)
-            result = cvdpTime.decodeTime(result)
-        else:
+    
+    if cvdpRegex.search(variable):
+        #special case for cvdp, as the times are really weird
+        result = xarray.open_mfdataset(paths, decode_times=False)
+        result = cvdpTime.decodeTime(result)
+    elif model == 'CESM-LME':
             #special case for CESM, as the dates are one day later then you expect. (i.e. the average for the first month of 850 is associated with the time co-ord of 1-Feb-850)
             result = xarray.open_mfdataset(paths)
             result['time'] = result['time']-pandas.to_timedelta(1, unit='d')
