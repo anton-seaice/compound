@@ -48,6 +48,7 @@ def getFilePaths(directory, *args):
 
     # Get all the files in the directory
     try:
+        print(directory)
         fileList = listdir(directory)
     except:
         raise EnvironmentError("Requested files not found. Is the harddrive plugged in and does this test case exist?")
@@ -87,37 +88,59 @@ def constructDirectoryPath(model, outputType, *args):
         elif outputType == 'MON':
             directory = 'CESM-LME/mon/' + args[0] + '/'
     else:
-        raise EnvironmentError("Selected model not found")
+        if outputType == 'CVDP':
+            directory = 'cmip5.'+model+'.cvdp_data'
+        else:
+            directory = model + '/' + args[0] + '/'
+       
+        #raise EnvironmentError("Selected model not found")
     
     return directory
 
-def loadModelData(model, variable, test):
+def loadModelData(model, variable, *args):
     """Loads data for the chosen model (CESM-LME is supported)
     
     
-    model = 'CESM-LME'
+    model = 'CESM-LME, past1000, historical, pi-control'
     variable = folder name for that variable, or 'cvdp_data' if desired
     test = name of model run, e.g. '001', or 'ORBITAL.003'
      
     
     """
     
-    #First we are going to make some file paths from the information provided.
+    if len(args)==1:
+        test=args[0]
     
     #make a regex to compare the variable name against, as cvdp is a special case.
-    regex=re.compile('cvdp')
+    cvdpRegex=re.compile('cvdp')
     
+    #First we are going to make some file paths from the information provided.
+    #CESM-LME
     if model=='CESM-LME' :
         #for CESM, make a filter term for file names, and make a directory
         #exampleFilterTerm = 'b\.e11\.BLMTRC5CN\.f19_g16.001\.pop\.h\.SST\..+\.nc'
         filterTerm = 'b\.e11\.B.*?\.f19_g16\.' + test + '\..*?' + variable + '\..+\.nc'
          
-        if regex.search(variable):
+        if cvdpRegex.search(variable):
             #for cvdp, special case
             directory = constructDirectoryPath('CESM-LME', 'CVDP')
         else :
             #for normal experiments
             directory = constructDirectoryPath('CESM-LME', 'MON', variable)
+    
+    #CVDP for other models (CMIP5)
+    elif cvdpRegex.search(variable):
+            #for cvdp, special case
+            directory = constructDirectoryPath(model, 'CVDP',)
+    
+    #other cmip5
+    elif test=='past1000' or test=='historical' or test=='piControl':
+        # psl_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc
+        #This line might need adjusting to include physics versions?
+        filterTerm = variable + '_Amon_'+model+'_'+test+'.*\.nc'
+         #for normal experiments
+        directory = constructDirectoryPath(test, 'MON', variable)
+
     else:
         #otherwise we are just going to throw an error
         raise EnvironmentError("Selected model not supported, please add to file handler")  
