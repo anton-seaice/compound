@@ -28,22 +28,27 @@ def averageForTimePeriod(indexXr):
     indexXr is a xarray
     
     returns a pandas Dataframe. (You can cast this into an xarray is desired pretty easily: xarray.Dataset(result))"""
-    #Figuring out the first and last year in the data set is more complicated than it should be. Here goes.
 
     firstYear = indexXr.time[0].dt.year
     lastYear = indexXr.time[-1].dt.year
     yearRange = numpy.arange(indexXr.time[0].dt.year,indexXr.time[-1].dt.year)
     
-    #ds = xarray.Dataset()
-    results = pandas.DataFrame(index=yearRange)
-    results.index.name='year'
+    indexNames = list(set(list(_index.monthsOfInterest)).intersection(list(indexXr.keys())))
+  
+    print(indexNames)
+    
+    #somewhere to write the answer
+    answer = numpy.ndarray([len(yearRange),len(indexNames)])
+    
 
-    for keys in _index.monthsOfInterest:
+
+    
+    #month=numpy.ndarray([len(indexNames),2])
+
+    for iKey in numpy.arange(0,len(indexNames)):
         #get the first and last month from _indexDefinitions
-        months=_index.monthsOfInterest[keys]
-        
-        #a list to populate in the next loop. First append everything to this list, and then add to the output dataframe
-        answer = list()
+        months=(_index.monthsOfInterest[indexNames[iKey]])
+        keys=indexNames[iKey]
         
         # if the period is within one year
         if months[1]<12:
@@ -53,7 +58,7 @@ def averageForTimePeriod(indexXr):
                     end= cftime.DatetimeNoLeap(year,months[1]+1,
                                                1), 
                                                      freq='M')
-                answer.append(float(indexXr[keys].sel(time=periodOfInterest).mean().values))
+                answer[year-yearRange[0],iKey]=(float(indexXr[keys].sel(time=periodOfInterest).mean().values))
         # if the period goes over two years
         else:
             for year in yearRange:
@@ -62,10 +67,13 @@ def averageForTimePeriod(indexXr):
                     end= cftime.DatetimeNoLeap(year+1,months[1]-12+1,
                                                1), 
                                                      freq='M')
-                answer.append(float(indexXr[keys].sel(time=periodOfInterest).mean().values))
+                answer[year-yearRange[0],iKey]=(float(indexXr[keys].sel(time=periodOfInterest).mean().values))
         
         # write the list into the dataframe
-        results[keys]=answer
+        
+    results = pandas.DataFrame(data=answer, index=yearRange, columns=indexNames)
+    results.index.name='year'
+    results[keys]=answer
 
     return results
     

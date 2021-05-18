@@ -97,7 +97,7 @@ def constructDirectoryPath(model, outputType, *args):
     
     return directory
 
-def loadModelData(model, variable, test):
+def loadModelData(model, variable, test, **kargs):
     """Loads data for the chosen model (CESM-LME is supported)
     
     
@@ -153,15 +153,15 @@ def loadModelData(model, variable, test):
     
     if cvdpRegex.search(variable):
         #special case for cvdp, as the times are really weird
-        result = xarray.open_mfdataset(paths, decode_times=False)
+        result = xarray.open_mfdataset(paths, decode_times=False, **kargs)
         result = cvdpTime.decodeTime(result)
     elif model == 'CESM-LME':
             #special case for CESM, as the dates are one day later then you expect. (i.e. the average for the first month of 850 is associated with the time co-ord of 1-Feb-850)
-            result = xarray.open_mfdataset(paths)
+            result = xarray.open_mfdataset(paths, **kargs)
             result['time'] = result['time']-pandas.to_timedelta(1, unit='d')
     else:
         # basically a place holder for other model types.
-        result = xarray.open_mfdataset(paths)
+        result = xarray.open_mfdataset(paths, **kargs)
     
     print("Files imported: \n",paths)
     

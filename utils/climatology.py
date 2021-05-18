@@ -32,8 +32,8 @@ def normalise(x, xClimatology):
     xClimatologyMean = xClimatology.groupby('time.month').mean(dim='time')
    
     # Use the calculated climatology to calculate the anomaly and the standard deviation
-    xAnom=(xMonthly-xClimatologyMean)
+    xAnom=(xMonthly-xClimatologyMean).groupby('time.month')
     xStd=xClimatology.groupby('time.month').std(dim='time')
     
     
-    return xAnom.groupby('time.month')/xStd
+    return xAnom/xStd

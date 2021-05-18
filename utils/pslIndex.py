@@ -14,9 +14,8 @@ def calculateClimatology(climatDs, climatStart, climatFinish):
     if regex.search(str(climatDs))==None:
         raise(EnvironmentError("Climatology Ds provided is not an xarray"))
 
-    #some output Ds
-    domainDs=xarray.Dataset(coords={"time":climatDs.time})
-    climatologyDs=domainDs.copy()
+    #output Ds
+    climatologyDs=xarray.Dataset(coords={"time":climatDs.time})
     
     #The two latitudes of interest are defined in _indexDefinitions
     domain = _index.pslIndex['sam']
@@ -65,7 +64,7 @@ def calculateSamIndex(ds, *args):
     domain = _index.pslIndex['sam']
     
     #ds for output
-    samIndex=xarray.Dataset(coords={"time":ds.time})
+    samIndex=xarray.DataArray(coords={"time":ds.time.values}, dims=['time'])
     
     domainDs=samIndex.copy()
     normalisedDs=samIndex.copy()
@@ -73,22 +72,27 @@ def calculateSamIndex(ds, *args):
     #for each latitude, calculate the climatology and normalise
     for keys in domain:
         #this is the data we want to calculate the index using
-        domainDs[keys]=ds.sel(lat=domain[keys],method='nearest', drop=True).PSL.mean(dim='lon')
+        domainDs=xarray.Dataset(
+            data_vars={keys:ds.sel(lat=domain[keys],method='nearest', drop=True).PSL.mean(dim='lon')} ,
+            coords={"time":ds.time.values}
+        )
         
         #if there were two arguments given for climatology, use the same data
         if len(args)==2:
             try:
-                climatologyDs[keys]=climat.dateInterval(domainDs[keys], int(args[0]), int(args[1]))
+                climatologyDs=climat.dateInterval(domainDs, int(args[0]), int(args[1]))
             except:
                 #There is an assumption here the error is that in couldn't cast the inputs to int
                 raise(EnvironmentError("Input Year Range not recognised"))
                 
         #normalise 
-        normalisedDs[keys]=climat.normalise(domainDs[keys],climatologyDs[keys])
+        normalisedDs[keys]=climat.normalise(domainDs,climatologyDs)
 
     samIndex['sam']=normalisedDs['lat1']-normalisedDs['lat2']
     
-    return samIndex
+    normalisedDs = normalisedDs.assign_attrs(domain)
+    
+    return samIndex, normalisedDs
 
 
 """

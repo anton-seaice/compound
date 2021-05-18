@@ -29,7 +29,9 @@ monthsOfInterest = {
     "nino4" : [7,15] ,
     #"westIO" : [7,12] ,
     "eastIO" : [7,12] , 
-    "sam" : [10, 15]
+    "sam" : [10, 15] ,
+    "lat1" : [10, 15],
+    "lat2" : [10, 15]
 }
 
 # This is the list of indices which are fire promoting when positive in the warm-season
