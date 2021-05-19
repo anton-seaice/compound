@@ -1,80 +1,66 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[4]:
-
-
-#import my functions
 import sys
 sys.path.append('../')
 import utils._indexDefinitions as _index
 
-
-# In[5]:
-
-
 import xarray
 import numpy
 import cftime
-import pandas
-
-
 
 
 def averageForTimePeriod(indexXr):
-    """calculates the averages for the period of interest defined in _indexDefitions for the indeces in _indexDefinitions
-    
+    """
+    calculates the averages for the period of interest defined in _indexDefitions for the indeces in _indexDefinitions
     
     indexXr is a xarray
     
-    returns a pandas Dataframe. (You can cast this into an xarray is desired pretty easily: xarray.Dataset(result))"""
+ """
 
-    firstYear = indexXr.time[0].dt.year
-    lastYear = indexXr.time[-1].dt.year
-    yearRange = numpy.arange(indexXr.time[0].dt.year,indexXr.time[-1].dt.year)
+    yearRange = numpy.arange(
+        indexXr.time[0].dt.year,  #firstYear
+        indexXr.time[-1].dt.year) #lastYear
     
+    #we are interested indices which we have defined months of Interest for and are in the data
     indexNames = list(set(list(_index.monthsOfInterest)).intersection(list(indexXr.keys())))
   
     print(indexNames)
     
     #somewhere to write the answer
-    answer = numpy.ndarray([len(yearRange),len(indexNames)])
-    
+    answer = list()
 
-
-    
-    #month=numpy.ndarray([len(indexNames),2])
-
-    for iKey in numpy.arange(0,len(indexNames)):
+    # for each index
+    for keys in indexNames:
         #get the first and last month from _indexDefinitions
-        months=(_index.monthsOfInterest[indexNames[iKey]])
-        keys=indexNames[iKey]
+        months=(_index.monthsOfInterest[keys])
         
         # if the period is within one year
         if months[1]<12:
-            for year in yearRange:
-                periodOfInterest=xarray.cftime_range(
-                    start=cftime.DatetimeNoLeap(year,months[0],1), 
-                    end= cftime.DatetimeNoLeap(year,months[1]+1,
-                                               1), 
-                                                     freq='M')
-                answer[year-yearRange[0],iKey]=(float(indexXr[keys].sel(time=periodOfInterest).mean().values))
+                answer.append(
+                    xarray.concat(
+                        [indexXr[keys].sel(
+                            time=slice(
+                                cftime.DatetimeNoLeap(year,months[0],1),
+                                cftime.DatetimeNoLeap(year,months[1]+1,1)
+                            )
+                        ).mean() for year in yearRange], 
+                        'year')
+                    )
         # if the period goes over two years
         else:
-            for year in yearRange:
-                periodOfInterest=xarray.cftime_range(
-                    start=cftime.DatetimeNoLeap(year,months[0],1), 
-                    end= cftime.DatetimeNoLeap(year+1,months[1]-12+1,
-                                               1), 
-                                                     freq='M')
-                answer[year-yearRange[0],iKey]=(float(indexXr[keys].sel(time=periodOfInterest).mean().values))
-        
-        # write the list into the dataframe
-        
-    results = pandas.DataFrame(data=answer, index=yearRange, columns=indexNames)
-    results.index.name='year'
-    results[keys]=answer
-
+                answer.append(
+                    xarray.concat(
+                        [indexXr[keys].sel(
+                            time=slice(
+                                cftime.DatetimeNoLeap(year,months[0],1),
+                                cftime.DatetimeNoLeap(year+1,months[1]-11,1)
+                            )
+                        ).mean() for year in yearRange], 
+                        'year')
+                     )
+    # merge the variables (indeces) back together
+    results = xarray.merge(answer)
+    results.year=yearRange
+    results = results.assign_attrs(indexXr.attrs)
+    
     return results
     
 
