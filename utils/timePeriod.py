@@ -20,9 +20,11 @@ def averageForTimePeriod(indexXr):
         indexXr.time[-1].dt.year) #lastYear
     
     #we are interested indices which we have defined months of Interest for and are in the data
-    indexNames = list(set(list(_index.monthsOfInterest)).intersection(list(indexXr.keys())))
+    indexNames = list(set(list(_index.monthsOfInterest)).intersection(list(indexXr.variables)))
   
-    print(indexNames)
+    if len(indexNames)==0:
+        raise EnvironmentError('No indeces found in input data to calculate interval for')
+    
     
     #somewhere to write the answer
     answer = list()
@@ -41,7 +43,7 @@ def averageForTimePeriod(indexXr):
                                 cftime.DatetimeNoLeap(year,months[0],1),
                                 cftime.DatetimeNoLeap(year,months[1]+1,1)
                             )
-                        ).mean() for year in yearRange], 
+                        ).mean(dim='time') for year in yearRange], 
                         'year')
                     )
         # if the period goes over two years
@@ -53,12 +55,12 @@ def averageForTimePeriod(indexXr):
                                 cftime.DatetimeNoLeap(year,months[0],1),
                                 cftime.DatetimeNoLeap(year+1,months[1]-11,1)
                             )
-                        ).mean() for year in yearRange], 
+                        ).mean(dim='time') for year in yearRange], 
                         'year')
                      )
     # merge the variables (indeces) back together
     results = xarray.merge(answer)
-    results.year=yearRange
+    results['year']=yearRange
     results = results.assign_attrs(indexXr.attrs)
     
     return results

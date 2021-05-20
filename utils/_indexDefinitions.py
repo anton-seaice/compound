@@ -24,14 +24,15 @@ monthsOfInterest = {
     "nino4NoDetrend" : [7,15] ,
     #"westIONoDetrend" : [7,12] ,
     "eastIONoDetrend" : [7,12] , 
-    "dmi": [7,15] ,
+    "dmi": [7,12] ,
     "nino34" : [7,15] ,
     "nino4" : [7,15] ,
     #"westIO" : [7,12] ,
     "eastIO" : [7,12] , 
     "sam" : [10, 15] ,
     "lat1" : [10, 15],
-    "lat2" : [10, 15]
+    "lat2" : [10, 15],
+    "precipAnom" : [9, 15]
 }
 
 # This is the list of indices which are fire promoting when positive in the warm-season
