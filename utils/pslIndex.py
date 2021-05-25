@@ -23,7 +23,7 @@ def calculateClimatology(climatDs, climatStart, climatFinish):
     #for each latitude, calculate the climatology 
     for keys in domain:
         climatologyDs[keys]=climat.dateInterval(
-            climatDs.sel(lat=domain[keys],method='nearest', drop=True).PSL.mean(dim='lon'),
+            climatDs.PSL.sel(lat=domain[keys],method='nearest', drop=True).mean(dim='lon'),
             climatStart,
             climatFinish
         )
@@ -57,65 +57,33 @@ def calculateSamIndex(ds, *args):
                 climatologyDs=args[0]
             else:
                 raise(EnvironmentError("Climatology Ds provided is not an xarray"))
-    elif len(args)!=2:
-        raise(EnvironmentError("Too many input arguments provided"))
+    #if there were two arguments given for climatology, use the same data
+    elif len(args)==2:
+        try:
+            climatologyDs=calculateClimatology(ds, int(args[0]), int(args[1]))
+        except:
+            #There is an assumption here the error is that in couldn't cast the inputs to int
+            raise(EnvironmentError("Input Year Range not recognised"))
+    else:
+        raise(EnvironmentError("Too few/many input arguments provided"))
+ 
     
     #The two latitudes of interest are defined in _indexDefinitions
     domain = _index.pslIndex['sam']
     
-    #ds for output
-    samIndex=xarray.DataArray(coords={"time":ds.time.values}, dims=['time'])
-    
-    domainDs=samIndex.copy()
-    normalisedDs=samIndex.copy()
-    
-    #for each latitude, calculate the climatology and normalise
-    for keys in domain:
-        #this is the data we want to calculate the index using
-        domainDs=xarray.Dataset(
-            data_vars={keys:ds.sel(lat=domain[keys],method='nearest', drop=True).PSL.mean(dim='lon')} ,
-            coords={"time":ds.time.values}
-        )
-        
-        #if there were two arguments given for climatology, use the same data
-        if len(args)==2:
-            try:
-                climatologyDs=climat.dateInterval(domainDs, int(args[0]), int(args[1]))
-            except:
-                #There is an assumption here the error is that in couldn't cast the inputs to int
-                raise(EnvironmentError("Input Year Range not recognised"))
-                
-        #normalise 
-        normalisedDs[keys]=climat.normalise(domainDs,climatologyDs)
+    #grab the data for the two latitues, and name vars 'lat1' and 'lat2'
+    domainDs=xarray.merge([
+        ds.PSL.sel(
+            lat=domain[keys],method='nearest', drop=True
+        ).rename(keys).mean(dim='lon') for keys in domain ] 
+    )
 
-    samIndex['sam']=normalisedDs['lat1']-normalisedDs['lat2']
-    
+    #normalise 
+    normalisedDs=climat.normalise(domainDs,climatologyDs)
     normalisedDs = normalisedDs.assign_attrs(domain)
     
-    return samIndex, normalisedDs
-
-
-"""
-    #average across each latitude of interest
-    ds40=ds.sel(lat=domain['lat1'],method='nearest', drop=True).PSL.mean(dim='lon')
-    ds65=ds.sel(lat=domain['lat2'],method='nearest', drop=True).PSL.mean(dim='lon')
+    #calc
+    samIndex=normalisedDs['lat1']-normalisedDs['lat2']
+    samIndex=samIndex.rename('sam')
     
-    if len(args)==0:
-        #filter by the climatology
-        ds40Climatology = climat.dateInterval(ds40, climatStart, climatFinish)
-        #filter by the climatology
-        ds65Climatology = climat.dateInterval(ds65, climatStart, climatFinish)
-    elif len(args)==1:
-        regex=re.compile('xarray')
-        if regex.search(str(type(args[0])))!=None:
-            climatDs=args[0]
-            
-            climatDs40=climatDs.sel(lat=domain['lat1'],method='nearest', drop=True).PSL.mean(dim='lon')
-            climatDs65=climatDs.sel(lat=domain['lat2'],method='nearest', drop=True).PSL.mean(dim='lon')
-            
-            ds40Climatology = climat.dateInterval(climatDs40, climatStart, climatFinish)
-            ds65Climatology = climat.dateInterval(climatDs65, climatStart, climatFinish)
-    else:
-        raise(EnvironmentError("Climatology Ds provided is not an xarray"))
-    """
-    
+    return  samIndex,normalisedDs

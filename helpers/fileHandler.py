@@ -51,7 +51,7 @@ def getFilePaths(directory, *args):
         print(directory)
         fileList = listdir(directory)
     except:
-        raise EnvironmentError("Requested files not found. Is the harddrive plugged in and does this test case exist?")
+        raise EnvironmentError("Requested files " + directory + " not found. Is the harddrive plugged in and does this test case exist?")
     
     # Get list of files from model run of interest accoding to the filter term
     regex = re.compile(filterTerm)
@@ -148,7 +148,7 @@ def loadModelData(model, variable, test, **kargs):
     
     # throw an error if we didn't find any files
     if len(paths)==0:
-        raise EnvironmentError("Files not found, possibly test name is wrong")
+        raise EnvironmentError("Files (filter term: " + filterTerm + " ) not found, possibly test name is wrong")
 
     
     if cvdpRegex.search(variable):
