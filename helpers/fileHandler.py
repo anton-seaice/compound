@@ -135,7 +135,7 @@ def loadModelData(model, variable, test, **kargs):
     elif test=='past1000' or test=='historical' or test=='piControl':
         # psl_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc
         #This line might need adjusting to include physics versions?
-        filterTerm = variable + '_Amon_'+model+'_'+test+'.*\.nc'
+        filterTerm = variable + '.+?'+model+'_'+test+'.*?\.nc' #CMIP table not specified, its assumed from .+?
          #for normal experiments
         directory = constructDirectoryPath(test, 'MON', variable)
 
@@ -157,11 +157,11 @@ def loadModelData(model, variable, test, **kargs):
         result = cvdpTime.decodeTime(result)
     elif model == 'CESM-LME':
             #special case for CESM, as the dates are one day later then you expect. (i.e. the average for the first month of 850 is associated with the time co-ord of 1-Feb-850)
-            result = xarray.open_mfdataset(paths, **kargs)
+            result = xarray.open_mfdataset(paths, parallel=True, **kargs)
             result['time'] = result['time']-pandas.to_timedelta(1, unit='d')
     else:
         # basically a place holder for other model types.
-        result = xarray.open_mfdataset(paths, **kargs)
+        result = xarray.open_mfdataset(paths, parallel=True, **kargs)
     
     print("Files imported: \n",paths)
     

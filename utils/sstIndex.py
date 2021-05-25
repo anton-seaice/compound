@@ -79,17 +79,25 @@ def calculateIndex(ds, *args):
     # For now, assume this is CESM output. Although CMIP should be principally the same non?
     #list of index names, as defined in _indexDefitions file
     index = _index.sstIndex
+
+    if (hasattr(ds, 'project_id')):
+        if (ds.project_id=='CMIP5'):
+            print('Ds looks like CMIP5')
+            ds=ds.rename_dims({'lat':'nlat', 'lon':'nlon'})
+            ds=ds.rename_vars({'ts':'SST','areacella':'TAREA', 'lat':'TLAT', 'lon':'TLONG'})
+    else:
+        print('Ds looks like CESM')
+        #CESM-LME
+        #There's only one depth dimension, so we will drop that
+        ds['SST']=ds.SST.isel(z_t=0)
+        if ds.TAREA.dims=='time':
+            #For some reason TAREA has a time dimension (possible from opening multiple files), but doesn't change in time, so well drop that too
+            ds['TAREA']=ds.TAREA.isel(time=0)
     
-    #There's only one depth dimension, so we will drop that
-    ds['SST']=ds.SST.isel(z_t=0)
-
-    if ds.TAREA.dims=='time':
-        #For some reason TAREA has a time dimension (possible from opening multiple files), but doesn't change in time, so well drop that too
-        ds['TAREA']=ds.TAREA.isel(time=0)
-
+    
     #Making TAREA a coordinate
     ds=ds.set_coords('TAREA')
-    
+
     #Create a dataset to add the results to
     resultDs = xarray.Dataset(coords={"time":ds.time})
     
@@ -100,25 +108,25 @@ def calculateIndex(ds, *args):
 
         #if there were two arguments given for climatology, use the same data
         if len(args)==2:
-            try:
+          #  try:
                 domainSstClimat=climat.dateInterval(domainDs, int(args[0]), int(args[1]))
                 
                 sstIndexMean = domainSstClimat.groupby('time.month', restore_coord_dims=True).mean(dim='time')
        
-            except:
+           # except:
                 #There is an assumption here the error is that in couldn't cast the inputs to int
-                raise(EnvironmentError("Input Year Range not recognised"))
+            #    raise(EnvironmentError("Input Year Range not recognised"))
         else:
             sstIndexMean=climatDs[key]
         
         # caluclate the sst anomolies 
-        domainDs['sstAnom']=domainDs.groupby(
+        sstAnomDs=domainDs.groupby(
             'time.month', restore_coord_dims=True
         )-sstIndexMean
 
         #Then calculate a weighted mean
         #easternSstAv=(nino34.sstAnom*nino34.TAREA).sum(dim=('nlat','nlon'))/nino34.TAREA.sum()
-        resultDs[key+'NoDetrend']=domainDs.sstAnom.weighted(domainDs.TAREA).mean(dim=('nlon','nlat'))
+        resultDs[key+'NoDetrend']=sstAnomDs.weighted(domainDs.TAREA).mean(dim=('nlon','nlat'))
                 
     # Special case for iod
     resultDs['dmi'] = resultDs['westIONoDetrend'] - resultDs['eastIONoDetrend']

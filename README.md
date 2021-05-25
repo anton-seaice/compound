@@ -7,7 +7,7 @@ Incomplete list of dependencies
 nc-time-axis (https://github.com/SciTools/nc-time-axis)
 xarray
 numpy
-cartopy
+cartopy (https://scitools.org.uk/cartopy/docs/latest/)
 
 
 
