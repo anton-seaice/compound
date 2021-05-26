@@ -25,10 +25,27 @@ def sstDomain(ds, indexKey):
 
     return domainDs
 
-def calculateClimatology(climatDs, climatStart, climatFinish): 
-    """From a provided dataset, start year and finish year, return the calculated mean for every SST index defined in _indexDefinitions file."""
+def calculateClimatology(climatDs, *args): 
+    """From a provided dataset, start year and finish year, return the calculated mean for every SST index defined in _indexDefinitions file.
     
-    climatDs['SST']=climatDs.SST.isel(z_t=0)
+    
+    Useage
+    calculateClimatology(climatDs) #calculates for all years
+    
+    Or to use a subset of the years
+    calculateClimatology(climatDs, climatStart, climatFinish)
+    
+    """
+
+    #Figure out what sort of data it is
+    if (hasattr(climatDs, 'project_id')):
+        if (climatDs.project_id=='CMIP5'):
+            print('Ds looks like CMIP5')
+            #Rename it to look like CESM data
+            climatDs=climatDs.rename_dims({'lat':'nlat', 'lon':'nlon'})
+            climatDs=climatDs.rename_vars({'ts':'SST','areacella':'TAREA', 'lat':'TLAT', 'lon':'TLONG'})
+    else:
+        climatDs['SST']=climatDs.SST.isel(z_t=0)
    
     index = _index.sstIndex
     
@@ -40,7 +57,11 @@ def calculateClimatology(climatDs, climatStart, climatFinish):
         
         domainDs=sstDomain(climatDs, key)
         
-        domainSstClimat=climat.dateInterval(domainDs, climatStart, climatFinish)      
+        if len(args)==2:
+            #reduce domain by years provided
+            domainDs=climat.dateInterval(domainDs, args[0], args[1])
+        elif len(args)!=0:
+            raise(Error("Wrong number of inputs provided"))
 
         #calculate the monthly means of that range
         sstMean[key] = domainSstClimat.groupby('time.month', restore_coord_dims=True).mean(dim='time')
