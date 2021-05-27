@@ -12,7 +12,7 @@ cesmAll = [*cesmRcp85, *cesmFullForcings]
 
 past1000 = [
     'bcc-csm1-1',
-    'CCSM4',
+    #'CCSM4',
     'CSIRO-Mk3L-1-2',
     'FGOALS-gl',
     'FGOALS-s2',
@@ -30,7 +30,7 @@ historical = [
     'BNU-ESM',
     'CanCM4',
     'CanESM2',
-    'CCSM4',
+    #'CCSM4', #Not sure if i should include?
     'CESM1-BGC',
     'CESM1-CAM5',
     'CMCC-CESM',

@@ -18,7 +18,20 @@ import sys
 sys.path.append('../')
 import helpers.cvdpTime as cvdpTime
 
+import cftime
 import pandas
+
+def to_365day_monthly(da):
+    '''Takes a DataArray. Change the 
+    calendar to 365_day and precision to monthly.'''
+    val = da.copy()
+    time1 = da.time.copy()
+    for itime in range(val.sizes['time']):
+        bb = val.time.values[itime].timetuple()
+        time1.values[itime] = cftime.DatetimeNoLeap(bb[0],bb[1],16)
+
+    val = val.assign_coords({'time':time1})
+    return val
 
 def getFilePaths(directory, *args):
     """Returns a list of absolute paths from a chosen directory
@@ -44,7 +57,6 @@ def getFilePaths(directory, *args):
         directory = '/Volumes/Untitled/CMIP5-PMIP3/'  + directory 
     else:
         raise EnvironmentError("Can't find where to look for data files. Operating System is " + operatingSystem)
-    
 
     # Get all the files in the directory
     try:
@@ -111,7 +123,7 @@ def loadModelData(model, variable, test, **kargs):
     #make a regex to compare the variable name against, as cvdp is a special case.
     cvdpRegex=re.compile('cvdp')
     
-    #First we are going to make some file paths from the information provided.
+#First we are going to make some file paths from the information provided.
     #CESM-LME
     if model=='CESM-LME' :
         #for CESM, make a filter term for file names, and make a directory
@@ -127,7 +139,6 @@ def loadModelData(model, variable, test, **kargs):
     
     #CVDP for other models (CMIP5)
     elif cvdpRegex.search(variable):
-        #for cvdp, special case
         filterTerm = model+'\.cvdp_data\..*\.nc'
         directory = constructDirectoryPath(model, 'CVDP', test)
     
@@ -136,21 +147,20 @@ def loadModelData(model, variable, test, **kargs):
         # psl_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc
         #This line might need adjusting to include physics versions?
         filterTerm = variable + '.+?'+model+'_'+test+'.*?\.nc' #CMIP table not specified, its assumed from .+?
-         #for normal experiments
         directory = constructDirectoryPath(test, 'MON', variable)
 
     else:
         #otherwise we are just going to throw an error
         raise EnvironmentError("Selected model not supported, please add to file handler")  
 
-    #get an array of paths for that filer term and directory    
+#Second get an list of paths for that filer term and directory    
     paths = getFilePaths(directory, filterTerm)
     
     # throw an error if we didn't find any files
     if len(paths)==0:
         raise EnvironmentError("Files (filter term: " + filterTerm + " ) not found, possibly test name is wrong")
 
-    
+#Third, open the Xr
     if cvdpRegex.search(variable):
         #special case for cvdp, as the times are really weird
         result = xarray.open_mfdataset(paths, decode_times=False, **kargs)
@@ -162,7 +172,15 @@ def loadModelData(model, variable, test, **kargs):
     else:
         # basically a place holder for other model types.
         result = xarray.open_mfdataset(paths, parallel=True, **kargs)
-    
+
+        timeRe=re.compile('time')
+        cfTimeRe=re.compile('cftime._cftime.Datetime360Day')
+        
+        for i in list(result.coords) :
+            if timeRe.search(i) :
+                if cfTimeRe.search(str(type(result.time.values[0]))):
+                    result = to_365day_monthly(result)
+        
     print("Files imported: \n",paths)
     
     return result
