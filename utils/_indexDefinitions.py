@@ -36,6 +36,10 @@ monthsOfInterest = {
     "tsAnom" : [9, 15]
 }
 
+nDaysOfInterest = {
+    "precAnom" : (30+31+30+31+31+28+31) # Sept (month 9) to March (month 15), No Leap
+}
+
 # This is the list of indices which are fire promoting when positive in the warm-season
 firePos = ['nino34', 'nino4', 'dmi', 'nino34NoDetrend', 'nino4NoDetrend' ]
 
