@@ -4,10 +4,21 @@ Developed using anaconda and python3
 
 Incomplete list of dependencies
 
-nc-time-axis (https://github.com/SciTools/nc-time-axis)
-xarray
-numpy
-cartopy (https://scitools.org.uk/cartopy/docs/latest/)
+xarray 0.18.0
+numpy 1.17.0
+cartopy 0.18.0
+
+jupyter core     : 4.7.1
+jupyter-notebook : 6.3.0
+qtconsole        : 5.0.3
+ipython          : 7.22.0
+ipykernel        : 5.3.4
+jupyter client   : 6.1.12
+jupyter lab      : 3.0.14
+nbconvert        : 6.0.7
+ipywidgets       : 7.6.3
+nbformat         : 5.1.3
+traitlets        : 5.0.5
 
 
 To Run:
