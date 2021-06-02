@@ -1,12 +1,10 @@
 # compound
 
-Developed using anaconda and python3
+This is a collection of scripts to examine changing frequenices of compounding impacts from multiple climate drivers upon mainland South East Australia.
 
-Incomplete list of dependencies
+Developed using python 3.7
 
-xarray 0.18.0
-numpy 1.17.0
-cartopy 0.18.0
+IDE versioning
 
 jupyter core     : 4.7.1
 jupyter-notebook : 6.3.0
@@ -20,6 +18,12 @@ ipywidgets       : 7.6.3
 nbformat         : 5.1.3
 traitlets        : 5.0.5
 
+Dependencies
+
+xarray 0.18.0
+numpy 1.17.0
+cartopy 0.18.0
+
 
 To Run:
 
@@ -29,7 +33,7 @@ output from cesmPrecTsMonthly is needed for cesmCompoundsImpact
 Descriptions:
 
 1. cesmIndeces
-- Calculates monthly indeces (for indeces indluded in utils/_indexDefinitions.py)
+- Calculates monthly indeces (for indeces included in utils/_indexDefinitions.py)
 - Calculates warm season averages (time periods defined in utils/_indexDefinitions.py)
 
 2. cesmCompounds
@@ -46,6 +50,10 @@ Descriptions:
 5. cesmCompoundImpacts
 - Rainfall and Temp anomalies for each individial event type, and each compound event type
 
+Source data:
+- CESM-LME ensemble outputs
+- CMIP5 past1000/historical/rcp outputs
+- CVDP outputs (for validation purposes only)
 
 Useful git commands:
 
