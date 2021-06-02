@@ -50,6 +50,10 @@ Descriptions:
 5. cesmCompoundImpacts
 - Rainfall and Temp anomalies for each individial event type, and each compound event type
 
+Source data:
+- CESM-LME ensemble outputs
+- CMIP5 past1000/historical/rcp outputs
+- CVDP outputs (for validation purposes only)
 
 Useful git commands:
 
