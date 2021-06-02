@@ -40,6 +40,8 @@ def getFilePaths(directory, *args):
     
     Optionally a second argument can be a regex term to search the chosen directory (default is all .nc files in the directory)
     
+    This is set-up for the developers environment
+    
     """
     # First, see if there is a second argument. If there is then this is the filterTerm, otherwise its just all .nc files
     if len(args)==0:
