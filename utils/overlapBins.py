@@ -17,6 +17,7 @@ def binSum(da):
     #a couple of vars to append to
     binMid=list()
     binSum=list()
+    binN=list()
 
     #hardcoding these is lazy, but maybe fine
     startYear=int(da.year[0])
@@ -25,6 +26,8 @@ def binSum(da):
     binSize=30
 
     numberOfBins=(endYear-startYear-binSize)/interval + 1
+    
+    
 
     # for every bin
     for iBin in numpy.arange(0,numberOfBins):
