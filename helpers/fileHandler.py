@@ -105,7 +105,7 @@ def constructDirectoryPath(model, outputType, *args):
         if outputType == 'CVDP':
             directory = 'cmip5.'+ args[0] +'.cvdp_data/'
         else:
-            directory = model + '/' + args[0] + '/'
+            directory = 'CMIP5/' + args[0] + '/'
        
         #raise EnvironmentError("Selected model not found")
     
@@ -145,15 +145,16 @@ def loadModelData(model, variable, test, **kargs):
         directory = constructDirectoryPath(model, 'CVDP', test)
     
     #other cmip5
-    elif test=='past1000' or test=='historical' or test=='piControl':
+    #elif test=='past1000' or test=='historical' or test=='piControl':
+    else:
         # psl_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc
         #This line might need adjusting to include physics versions?
         filterTerm = variable + '.+?'+model+'_'+test+'.*?\.nc' #CMIP table not specified, its assumed from .+?
         directory = constructDirectoryPath(test, 'MON', variable)
 
-    else:
+    #else:
         #otherwise we are just going to throw an error
-        raise EnvironmentError("Selected model not supported, please add to file handler")  
+    #    raise EnvironmentError("Selected model not supported, please add to file handler")  
 
 #Second get an list of paths for that filer term and directory    
     paths = getFilePaths(directory, filterTerm)

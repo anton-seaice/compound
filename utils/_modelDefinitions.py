@@ -13,13 +13,13 @@ cesmNoRepeats = [*cesmRcp85, '001','004','005','006','007','010','011','012','01
 #cmip
 
 past1000 = [
-    'bcc-csm1-1',
+    #'bcc-csm1-1',
     #'CCSM4',
-    'CSIRO-Mk3L-1-2',
-    'FGOALS-gl',
-    'FGOALS-s2',
-    'GISS-E2-R',
-    'HadCM3',
+    #'CSIRO-Mk3L-1-2',
+    #'FGOALS-gl',
+    #'FGOALS-s2',
+    #'GISS-E2-R',
+    #'HadCM3',
     'IPSL-CM5A-LR',
     'MIROC-ESM',
     'MPI-ESM-P',
