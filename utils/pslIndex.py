@@ -7,13 +7,35 @@ import cftime
 import xarray
 import re
 
-def calculateClimatology(climatDs, climatStart, climatFinish):
+def calculateClimatology(climatDs, *args):
+    
+    """From a provided dataset, start year and finish year, return the calculated mean for every psl lat defined in _indexDefinitions file.
+    
+    
+    Useage
+    calculateClimatology(climatDs) #calculates for all years
+    
+    Or to use a subset of the years
+    calculateClimatology(climatDs, climatStart, climatFinish)
+    
+    """
+    
+    
     
     #check the input is actually an xarray
     regex=re.compile('xarray')
     if regex.search(str(climatDs))==None:
         raise(EnvironmentError("Climatology Ds provided is not an xarray"))
 
+    #tidy up input data so the variable names are common between CMIP and CESM
+    if (hasattr(climatDs, 'project_id')):
+        if (climatDs.project_id=='CMIP5'):
+            print('Ds looks like CMIP5')
+            climatDs=climatDs.rename_vars({'psl':'PSL'})
+    else:
+        print('Ds looks like CESM') #CESM-LME
+        
+        
     #output Ds
     climatologyDs=xarray.Dataset(coords={"time":climatDs.time})
     
@@ -22,12 +44,17 @@ def calculateClimatology(climatDs, climatStart, climatFinish):
     
     #for each latitude, calculate the climatology 
     for keys in domain:
-        climatologyDs[keys]=climat.dateInterval(
-            climatDs.PSL.sel(lat=domain[keys],method='nearest', drop=True).mean(dim='lon'),
-            climatStart,
-            climatFinish
-        )
         
+        domainDs=climatDs.PSL.sel(lat=domain[keys],method='nearest', drop=True)
+        
+        if len(args)==2:
+            #reduce domain by years provided
+            domainDs=climat.dateInterval(domainDs, args[0], args[1])
+        elif len(args)!=0:
+            raise(Error("Wrong number of inputs provided"))
+        
+        climatologyDs[keys]=domainDs.mean(dim='lon')
+    
     return climatologyDs
         
         
@@ -67,6 +94,14 @@ def calculateSamIndex(ds, *args):
     else:
         raise(EnvironmentError("Too few/many input arguments provided"))
  
+
+    #tidy up input data so the variable names are common between CMIP and CESM
+    if (hasattr(ds, 'project_id')):
+        if (ds.project_id=='CMIP5'):
+            print('Ds looks like CMIP5')
+            ds=ds.rename_vars({'psl':'PSL'})
+    else:
+        print('Ds looks like CESM') #CESM-LME
     
     #The two latitudes of interest are defined in _indexDefinitions
     domain = _index.pslIndex['sam']
