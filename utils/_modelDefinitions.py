@@ -1,3 +1,5 @@
+import numpy
+
 #cesm here referes to CESM LME
 
 cesmFullForcings = ['001','002','003','004','005','006','007','008','009','010','011','012','013']
@@ -10,7 +12,11 @@ cesmAll = [*cesmRcp85, cesmCntl, *cesmFullForcings]
 
 cesmNoRepeats = [*cesmRcp85, '001','004','005','006','007','010','011','012','013']
 
-#cmip
+#cmip6
+
+scenarioMIP=numpy.genfromtxt('X:\\compound\\utils\\_scenarioMipModels.csv', dtype=str, delimiter=',')
+
+#cmip5
 
 past1000 = [
     #'bcc-csm1-1',

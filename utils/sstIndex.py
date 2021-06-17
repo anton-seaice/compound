@@ -39,8 +39,8 @@ def calculateClimatology(climatDs, *args):
 
     #Figure out what sort of data it is
     if (hasattr(climatDs, 'project_id')):
-        if (climatDs.project_id=='CMIP5'):
-            print('Ds looks like CMIP5')
+        if (climatDs.project_id=='CMIP'):
+            print('Ds looks like CMIP')
             #Rename it to look like CESM data
             climatDs=climatDs.rename_dims({'lat':'nlat', 'lon':'nlon'})
             climatDs=climatDs.rename_vars({'ts':'SST','areacella':'TAREA', 'lat':'TLAT', 'lon':'TLONG'})
@@ -100,8 +100,8 @@ def calculateIndex(ds, *args):
     
     #tidy up input data so the variable names are common between CMIP and CESM
     if (hasattr(ds, 'project_id')):
-        if (ds.project_id=='CMIP5'):
-            print('Ds looks like CMIP5')
+        if (ds.project_id=='CMIP'):
+            print('Ds looks like CMIP')
             ds=ds.rename_dims({'lat':'nlat', 'lon':'nlon'})
             ds=ds.rename_vars({'ts':'SST','areacella':'TAREA', 'lat':'TLAT', 'lon':'TLONG'})
     else:

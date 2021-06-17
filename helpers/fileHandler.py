@@ -7,8 +7,7 @@ from os import listdir
 #Import regex 
 import re
 
-#This is to figure out which computer this is running on 
-from platform import system
+
 
 #Import logging
 import logging
@@ -18,8 +17,12 @@ import sys
 sys.path.append('../')
 import helpers.cvdpTime as cvdpTime
 
+import utils._modelDefinitions as _model
+
 import cftime
 import pandas
+import s3fs
+import numpy
 
 def to_365day_monthly(da):
     '''Takes a DataArray. Change the 
@@ -52,14 +55,8 @@ def getFilePaths(directory, *args):
         raise EnvironmentError("Wrong number of arguments provided")
     
     # Second, find a path to look for files
-    operatingSystem = system()
-    if operatingSystem == 'Windows':
-        directory = 'E:/CMIP5-PMIP3/' + directory
-    elif operatingSystem == 'Darwin':
-        directory = '/Volumes/Untitled/CMIP5-PMIP3/'  + directory 
-    else:
-        raise EnvironmentError("Can't find where to look for data files. Operating System is " + operatingSystem)
-
+    directory = basePath() + directory
+    
     # Get all the files in the directory
     try:
         print(directory)
@@ -73,6 +70,20 @@ def getFilePaths(directory, *args):
     listRun1 = [directory + f for f in listRun1]
 
     return listRun1
+
+
+def basePath():
+    #This is to figure out which computer this is running on 
+    from platform import system
+    operatingSystem = system()
+    if operatingSystem == 'Windows':
+        return 'E:/CMIP5-PMIP3/'
+    elif operatingSystem == 'Darwin':
+        return '/Volumes/Untitled/CMIP5-PMIP3/'  
+    else:
+        raise EnvironmentError("Can't find where to look for data files. Operating System is " + operatingSystem)
+        
+        
 
 
 
@@ -103,9 +114,9 @@ def constructDirectoryPath(model, outputType, *args):
             directory = 'CESM-LME/mon/' + args[0] + '/'
     else:
         if outputType == 'CVDP':
-            directory = 'cmip5.'+ args[0] +'.cvdp_data/'
+            directory = 'cmip6.'+ args[0] +'.cvdp_data/'
         else:
-            directory = 'CMIP5/' + args[0] + '/'
+            directory = 'CMIP6/'
        
         #raise EnvironmentError("Selected model not found")
     
@@ -149,7 +160,7 @@ def loadModelData(model, variable, test, **kargs):
     else:
         # psl_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc
         #This line might need adjusting to include physics versions?
-        filterTerm = variable + '.+?'+model+'_'+test+'.*?\.nc' #CMIP table not specified, its assumed from .+?
+        filterTerm = variable + '_.*?'+model+'_'+test+'.*?\.nc' #CMIP table not specified, its assumed from .+?
         directory = constructDirectoryPath(test, 'MON', variable)
 
     #else:
@@ -159,7 +170,12 @@ def loadModelData(model, variable, test, **kargs):
 #Second get an list of paths for that filer term and directory    
     paths = getFilePaths(directory, filterTerm)
     
-    # throw an error if we didn't find any files
+
+    #try downloadning them from aws
+    if len(paths)==0:
+        paths = awsDownloader(model, variable, test )
+      
+    # throw an error if we still didn't find any files      
     if len(paths)==0:
         raise EnvironmentError("Files (filter term: " + filterTerm + " ) not found, possibly test name is wrong")
 
@@ -174,16 +190,79 @@ def loadModelData(model, variable, test, **kargs):
             result['time'] = result['time']-pandas.to_timedelta(1, unit='d')
     else:
         # basically a place holder for other model types.
-        result = xarray.open_mfdataset(paths, parallel=True, **kargs)
+        result = xarray.open_mfdataset(paths, parallel=True, use_cftime=True, **kargs)
 
         timeRe=re.compile('time')
-        cfTimeRe=re.compile('cftime._cftime.Datetime360Day')
+        cfTimeRe=re.compile('cftime._cftime.DatetimeNoLeap')
         
         for i in list(result.coords) :
             if timeRe.search(i) :
-                if cfTimeRe.search(str(type(result.time.values[0]))):
+                if not(cfTimeRe.search(str(type(result.time.values[0])))):
                     result = to_365day_monthly(result)
         
     print("Files imported: \n",paths)
     
     return result
+
+
+def awsDownloader(model, varname, test ): 
+
+    import boto3
+    import botocore
+    
+    #source: https://github.com/aradhakrishnanGFDL/gfdl-aws-analysis/blob/community/examples/s3_list_example.py
+
+    '''
+    This script provides an example on how to list files (all Amon tas fields in the gfdl-esgf bucket) in the gfdl-esgf bucket with anonymous access
+    You can edit the prefix, delimiters, search facets such as miptable/varname as you see fit.
+    '''
+    
+    
+    region = 'us-east-2'
+    s3client = boto3.client('s3',region_name=region,
+                            config=botocore.client.Config(signature_version=botocore.UNSIGNED)
+                           )
+
+    paginator = s3client.get_paginator('list_objects')
+
+    source_bucket = 'esgf-world'
+
+    #miptable = "Amon"
+    s3prefix = "s3:/"
+
+    #pat = re.compile(r'key\/.+\/<pattern>\/.+.gz')
+
+    fileObjs = list()
+
+    fs_s3 = s3fs.S3FileSystem(anon=True)
+
+    source_prefix = 'CMIP6/CMIP/'+ institutionFinder(model) +'/'+ model +'/'+ test + '/r1'
+    #print(source_prefix)
+
+    fileList=list()
+    
+    for result in paginator.paginate(Bucket=source_bucket, Prefix=source_prefix, Delimiter='.nc'):
+        for prefixes in result.get('CommonPrefixes'):
+            commonprefix = prefixes.get('Prefix')
+            searchpath = commonprefix
+
+     #       print(searchpath)
+            pat = re.compile('({}/)'.format(varname.split('_')[0]))
+            m = re.search(pat, searchpath)
+            if m is not None:
+                lst = commonprefix.split('/')
+                print('Downloading ' + lst[-1])
+                path=('{}/{}/{}'.format(s3prefix,source_bucket,commonprefix))
+                fs_s3.download(path, basePath()+'CMIP6/'+lst[-1])
+                fileList.append(basePath()+'CMIP6/'+lst[-1])
+                
+    if len(fileList)==0:
+        print("file not found on AWS")
+    return fileList
+                
+def institutionFinder(model) :
+    for i in numpy.arange(0, len(_model.scenarioMIP)):
+        if model==_model.scenarioMIP[i,1]:
+            return _model.scenarioMIP[i,0]
+        
+    raise EnvironmentError("Institution not found for this model")
