@@ -1,6 +1,7 @@
 import xarray
 import cftime
 import re
+import numpy
 
 import sys
 sys.path.append('../')
@@ -40,10 +41,12 @@ def calculateClimatology(climatDs, *args):
     #Figure out what sort of data it is
     if (hasattr(climatDs, 'project_id')):
         if (climatDs.project_id=='CMIP'):
-            print('Ds looks like CMIP')
+            #print('Ds looks like CMIP')
             #Rename it to look like CESM data
             climatDs=climatDs.rename_dims({'lat':'nlat', 'lon':'nlon'})
-            climatDs=climatDs.rename_vars({'ts':'SST','areacella':'TAREA', 'lat':'TLAT', 'lon':'TLONG'})
+            climatDs=climatDs.rename_vars({'ts':'SST',
+                                           #'areacella':'TAREA', 
+                                           'lat':'TLAT', 'lon':'TLONG'})
     else:
         climatDs['SST']=climatDs.SST.isel(z_t=0)
    
@@ -101,9 +104,11 @@ def calculateIndex(ds, *args):
     #tidy up input data so the variable names are common between CMIP and CESM
     if (hasattr(ds, 'project_id')):
         if (ds.project_id=='CMIP'):
-            print('Ds looks like CMIP')
+            #print('Ds looks like CMIP')
             ds=ds.rename_dims({'lat':'nlat', 'lon':'nlon'})
-            ds=ds.rename_vars({'ts':'SST','areacella':'TAREA', 'lat':'TLAT', 'lon':'TLONG'})
+            ds=ds.rename_vars({'ts':'SST',
+                               #'areacella':'TAREA',
+                               'lat':'TLAT', 'lon':'TLONG'})
     else:
         print('Ds looks like CESM') #CESM-LME
         #There's only one depth dimension, so we will drop that
@@ -114,7 +119,7 @@ def calculateIndex(ds, *args):
     
     
     #Making TAREA a coordinate
-    ds=ds.set_coords('TAREA')
+    #ds=ds.set_coords('TAREA')
 
     #Create a dataset to add the results to
     resultDs = xarray.Dataset(coords={"time":ds.time})
@@ -140,8 +145,13 @@ def calculateIndex(ds, *args):
         sstAnomDs=domainDs.groupby('time.month', restore_coord_dims=True
         )-sstIndexMean
 
+        # to calculate an area weight average, using TAREA is best, but lots of data sets don't seem to have this, so weighting by the cosine of the latitude
+        #http://xarray.pydata.org/en/stable/examples/area_weighted_temperature.html
+        weights=numpy.cos(numpy.deg2rad(domainDs.TLAT))
+        #weights=domainDs.TAREA
+        
         #Then calculate a weighted mean
-        resultDs[key+'NoDetrend']=sstAnomDs.weighted(domainDs.TAREA).mean(dim=('nlon','nlat'))
+        resultDs[key+'NoDetrend']=sstAnomDs.weighted(weights).mean(dim=('nlon','nlat'))
         
         
     # Special case for iod

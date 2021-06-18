@@ -98,7 +98,7 @@ def calculateSamIndex(ds, *args):
     #tidy up input data so the variable names are common between CMIP and CESM
     if any([hasattr(ds, 'project_id'), hasattr(ds, 'mip_era')]):
         if ds.mip_era=='CMIP6':
-            print('Ds looks like CMIP6')
+           # print('Ds looks like CMIP6')
             ds=ds.rename_vars({'psl':'PSL'})
     else:
         print('Ds looks like CESM') #CESM-LME

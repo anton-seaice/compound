@@ -14,7 +14,7 @@ cesmNoRepeats = [*cesmRcp85, '001','004','005','006','007','010','011','012','01
 
 #cmip6
 
-scenarioMIP=numpy.genfromtxt('X:\\compound\\utils\\_scenarioMipModels.csv', dtype=str, delimiter=',')
+scenarioMIP=numpy.genfromtxt('X:\\compound\\utils\\_scenarioMipModels.csv', dtype=str, delimiter=',', skip_header=1)
 
 #cmip5
 

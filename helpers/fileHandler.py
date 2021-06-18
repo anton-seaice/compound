@@ -59,7 +59,6 @@ def getFilePaths(directory, *args):
     
     # Get all the files in the directory
     try:
-        print(directory)
         fileList = listdir(directory)
     except:
         raise EnvironmentError("Requested files " + directory + " not found. Is the harddrive plugged in and does this test case exist?")
@@ -122,7 +121,7 @@ def constructDirectoryPath(model, outputType, *args):
     
     return directory
 
-def loadModelData(model, variable, test, **kargs):
+def loadModelData(model, variable, test,*args, **kargs):
     """Loads data for the chosen model (CESM-LME is supported)
     
     
@@ -135,6 +134,11 @@ def loadModelData(model, variable, test, **kargs):
     
     #make a regex to compare the variable name against, as cvdp is a special case.
     cvdpRegex=re.compile('cvdp')
+    
+    if len(args)==1:
+        variant=args[0]
+    else:
+        variant='r1i1p1f1' #used for CMIP6 only
     
 #First we are going to make some file paths from the information provided.
     #CESM-LME
@@ -160,7 +164,7 @@ def loadModelData(model, variable, test, **kargs):
     else:
         # psl_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc
         #This line might need adjusting to include physics versions?
-        filterTerm = variable + '_.*?'+model+'_'+test+'.*?\.nc' #CMIP table not specified, its assumed from .+?
+        filterTerm = variable + '_.*?'+model+'_'+test+'_'+variant+'_.*?\.nc' # if CMIP table not specified, its assumed from .+?
         directory = constructDirectoryPath(test, 'MON', variable)
 
     #else:
@@ -173,7 +177,7 @@ def loadModelData(model, variable, test, **kargs):
 
     #try downloadning them from aws
     if len(paths)==0:
-        paths = awsDownloader(model, variable, test )
+        paths = awsDownloader(model, variable, test, variant)
       
     # throw an error if we still didn't find any files      
     if len(paths)==0:
@@ -200,12 +204,12 @@ def loadModelData(model, variable, test, **kargs):
                 if not(cfTimeRe.search(str(type(result.time.values[0])))):
                     result = to_365day_monthly(result)
         
-    print("Files imported: \n",paths)
+    #print("Files imported: \n",paths)
     
     return result
 
 
-def awsDownloader(model, varname, test ): 
+def awsDownloader(model, varname, test, variant ): 
 
     import boto3
     import botocore
@@ -236,8 +240,13 @@ def awsDownloader(model, varname, test ):
 
     fs_s3 = s3fs.S3FileSystem(anon=True)
 
-    source_prefix = 'CMIP6/CMIP/'+ institutionFinder(model) +'/'+ model +'/'+ test + '/r1'
-    #print(source_prefix)
+    if any([test=='historical', test=='piControl']):
+        source_prefix='CMIP6/CMIP/'
+    elif test.find('ssp')>=0:
+        source_prefix='CMIP6/ScenarioMIP/'
+    
+    source_prefix = source_prefix + institutionFinder(model) +'/'+ model +'/'+ test + '/' + variant
+    print(source_prefix)
 
     fileList=list()
     
@@ -247,7 +256,7 @@ def awsDownloader(model, varname, test ):
             searchpath = commonprefix
 
      #       print(searchpath)
-            pat = re.compile('({}/)'.format(varname.split('_')[0]))
+            pat = re.compile('({}/{}/)'.format(varname.split('_')[1],varname.split('_')[0]))
             m = re.search(pat, searchpath)
             if m is not None:
                 lst = commonprefix.split('/')
