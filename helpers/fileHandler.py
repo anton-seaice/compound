@@ -171,13 +171,13 @@ def loadModelData(model, variable, test,*args, **kargs):
     paths = getFilePaths(directory, filterTerm)
 
     #try downloadning them from aws
-    if len(paths)==0:
-        paths = awsDownloader(model, variable, test, variant)
+    #if len(paths)==0:
+    #    paths = awsDownloader(model, variable, test, variant)
       
     #try online from esgf
     if len(paths)==0:
-        paths = esgfOpenDap(model, variable, test, variant)
-    
+        esgfDownloader(model, variable, test, variant)
+        paths = getFilePaths(directory, filterTerm)
     
     # throw an error if we still didn't find any files      
     if len(paths)==0:
@@ -277,8 +277,9 @@ def institutionFinder(model) :
     raise EnvironmentError("Institution not found for this model")
     
     
-def esgfOpenDap(model, varname, test, variant ):
+def esgfDownloader(model, varname, test, variant ):
     from pyesgf.search import SearchConnection
+    from subprocess import check_output
     
     
     conn = SearchConnection('https://esgf-data.dkrz.de/esg-search')
@@ -290,12 +291,29 @@ def esgfOpenDap(model, varname, test, variant ):
         experiment_id=test, 
         variable=varname.split('_')[0], 
         frequency='mon', 
-        variant_label=variant,
+        variant_label=variant
+        #data_node='esgf3.dkrz.de'
     )
 
-    result = ctx.search()
+    results = ctx.search()
     
-    print ("Found on ESGF")
-    print([iR.dataset_id for iR in result])
+    if len(results)==0:
+        print("file not found on ESGF")
+        return False
+    
+    for result in results:
+        print(result.dataset_id +' downloading')
         
-    return ([iR.opendap_url for iR in result])
+        with open(basePath()+'CMIP6/'+model+varname+test+'dl.sh', "w") as writer:
+            writer.write(
+                result.file_context().get_download_script()
+            )
+        #import os
+
+        #os.chmod('dl.sh', 0o750)
+        print(
+            check_output('bash ./'+model+varname+test+'dl.sh -s', shell=True, cwd=basePath()+'CMIP6')
+        )
+
+     
+    return True
