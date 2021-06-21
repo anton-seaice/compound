@@ -167,18 +167,18 @@ def loadModelData(model, variable, test,*args, **kargs):
         filterTerm = variable + '_.*?'+model+'_'+test+'_'+variant+'_.*?\.nc' # if CMIP table not specified, its assumed from .+?
         directory = constructDirectoryPath(test, 'MON', variable)
 
-    #else:
-        #otherwise we are just going to throw an error
-    #    raise EnvironmentError("Selected model not supported, please add to file handler")  
-
 #Second get an list of paths for that filer term and directory    
     paths = getFilePaths(directory, filterTerm)
-    
 
     #try downloadning them from aws
     if len(paths)==0:
         paths = awsDownloader(model, variable, test, variant)
       
+    #try online from esgf
+    if len(paths)==0:
+        paths = esgfOpenDap(model, variable, test, variant)
+    
+    
     # throw an error if we still didn't find any files      
     if len(paths)==0:
         raise EnvironmentError("Files (filter term: " + filterTerm + " ) not found, possibly test name is wrong")
@@ -275,3 +275,27 @@ def institutionFinder(model) :
             return _model.scenarioMIP[i,0]
         
     raise EnvironmentError("Institution not found for this model")
+    
+    
+def esgfOpenDap(model, varname, test, variant ):
+    from pyesgf.search import SearchConnection
+    
+    
+    conn = SearchConnection('https://esgf-data.dkrz.de/esg-search')
+    #conn = SearchConnection('https://esgf.nci.org.au/esg-search')
+
+    ctx = conn.new_context(
+        project='CMIP6', 
+        source_id=model, 
+        experiment_id=test, 
+        variable=varname.split('_')[0], 
+        frequency='mon', 
+        variant_label=variant,
+    )
+
+    result = ctx.search()
+    
+    print ("Found on ESGF")
+    print([iR.dataset_id for iR in result])
+        
+    return ([iR.opendap_url for iR in result])
