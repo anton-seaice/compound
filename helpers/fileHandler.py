@@ -21,7 +21,7 @@ import utils._modelDefinitions as _model
 
 import cftime
 import pandas
-import s3fs
+
 import numpy
 
 def to_365day_monthly(da):
@@ -77,6 +77,8 @@ def basePath():
     operatingSystem = system()
     if operatingSystem == 'Windows':
         return 'E:/CMIP5-PMIP3/'
+    if operatingSystem == 'Linux':
+        return '/mnt/e/CMIP5-PMIP3/'
     elif operatingSystem == 'Darwin':
         return '/Volumes/Untitled/CMIP5-PMIP3/'  
     else:
@@ -170,19 +172,17 @@ def loadModelData(model, variable, test,*args, **kargs):
 #Second get an list of paths for that filer term and directory    
     paths = getFilePaths(directory, filterTerm)
 
-    #try downloadning them from aws
-    if len(paths)==0:
-        paths = awsDownloader(model, variable, test, variant)
-      
     #try online from esgf
     if len(paths)==0:
-        paths = esgfOpenDap(model, variable, test, variant)
-    
+        esgfDownloader(model, variable, test, variant)
+        paths = getFilePaths(directory, filterTerm)
     
     # throw an error if we still didn't find any files      
     if len(paths)==0:
         raise EnvironmentError("Files (filter term: " + filterTerm + " ) not found, possibly test name is wrong")
 
+   # print(paths)
+        
 #Third, open the Xr
     if cvdpRegex.search(variable):
         #special case for cvdp, as the times are really weird
@@ -213,6 +213,7 @@ def awsDownloader(model, varname, test, variant ):
 
     import boto3
     import botocore
+    import s3fs
     
     #source: https://github.com/aradhakrishnanGFDL/gfdl-aws-analysis/blob/community/examples/s3_list_example.py
 
@@ -277,9 +278,9 @@ def institutionFinder(model) :
     raise EnvironmentError("Institution not found for this model")
     
     
-def esgfOpenDap(model, varname, test, variant ):
+def esgfDownloader(model, varname, test, variant ):
     from pyesgf.search import SearchConnection
-    
+    from subprocess import check_output
     
     conn = SearchConnection('https://esgf-data.dkrz.de/esg-search')
     #conn = SearchConnection('https://esgf.nci.org.au/esg-search')
@@ -293,9 +294,25 @@ def esgfOpenDap(model, varname, test, variant ):
         variant_label=variant,
     )
 
-    result = ctx.search()
+    results = ctx.search()
     
-    print ("Found on ESGF")
-    print([iR.dataset_id for iR in result])
-        
-    return ([iR.opendap_url for iR in result])
+    if len(results)==0:
+        print("file not found on ESGF")
+        return False
+
+    for result in results:
+        print(result.dataset_id +' downloading')
+
+        with open(basePath()+'CMIP6/'+model+varname+test+'dl.sh', "w") as writer:
+            writer.write(
+                result.file_context().get_download_script()
+            )
+        #import os
+
+        #os.chmod('dl.sh', 0o750)
+        print(
+            check_output('bash ./'+model+varname+test+'dl.sh -s', shell=True, cwd=basePath()+'CMIP6')
+        )
+
+     
+    return True
