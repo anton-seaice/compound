@@ -24,6 +24,16 @@ import pandas
 
 import numpy
 
+def institutionFinder(model) :
+    """ Find the instituion for this model and return it"""
+    
+    
+    for i in numpy.arange(0, len(_model.scenarioMIP)):
+        if model==_model.scenarioMIP[i,1]:
+            return _model.scenarioMIP[i,0]
+        
+    raise EnvironmentError("Institution not found for this model")
+
 def to_365day_monthly(da):
     '''Takes a DataArray. Change the 
     calendar to 365_day and precision to monthly.'''
@@ -36,6 +46,20 @@ def to_365day_monthly(da):
     val = val.assign_coords({'time':time1})
     return val
 
+
+def basePath():
+    """This is to figure out which computer this is running on""" 
+    from platform import system
+    operatingSystem = system()
+    if operatingSystem == 'Windows':
+        return 'E:/CMIP5-PMIP3/'
+    if operatingSystem == 'Linux':
+        return '/mnt/e/CMIP5-PMIP3/'
+    elif operatingSystem == 'Darwin':
+        return '/Volumes/Untitled/CMIP5-PMIP3/'  
+    else:
+        raise EnvironmentError("Can't find where to look for data files. Operating System is " + operatingSystem)
+        
 def getFilePaths(directory, *args):
     """Returns a list of absolute paths from a chosen directory
     
@@ -70,30 +94,11 @@ def getFilePaths(directory, *args):
 
     return listRun1
 
-
-def basePath():
-    #This is to figure out which computer this is running on 
-    from platform import system
-    operatingSystem = system()
-    if operatingSystem == 'Windows':
-        return 'E:/CMIP5-PMIP3/'
-    if operatingSystem == 'Linux':
-        return '/mnt/e/CMIP5-PMIP3/'
-    elif operatingSystem == 'Darwin':
-        return '/Volumes/Untitled/CMIP5-PMIP3/'  
-    else:
-        raise EnvironmentError("Can't find where to look for data files. Operating System is " + operatingSystem)
-        
-        
-
-
-
 def constructDirectoryPath(model, outputType, *args):
     """Creates a directory name from arguments provided
     
-    
     valid inputs are: 
-    model: 'CESM-LME'
+    model: 'CESM-LME'. 'CMIP6'
     outputType: 'CVDP', 'DAY', 'MON'
     *args: This is the variable desired
     
@@ -124,19 +129,18 @@ def constructDirectoryPath(model, outputType, *args):
     return directory
 
 def loadModelData(model, variable, test,*args, **kargs):
-    """Loads data for the chosen model (CESM-LME is supported)
-    
+    """Opens data for the chosen model (CESM-LME is supported and CMIP6)
     
     model = 'CESM-LME, past1000, historical, pi-control'
     variable = folder name for that variable, or 'cvdp_data' if desired
     test = name of model run, e.g. '001', or 'ORBITAL.003'
-     
     
     """
     
     #make a regex to compare the variable name against, as cvdp is a special case.
     cvdpRegex=re.compile('cvdp')
     
+    #args might be a variant for CMIP6
     if len(args)==1:
         variant=args[0]
     else:
@@ -156,7 +160,7 @@ def loadModelData(model, variable, test,*args, **kargs):
             #for normal experiments
             directory = constructDirectoryPath('CESM-LME', 'MON', variable)
     
-    #CVDP for other models (CMIP5)
+    #CVDP for other models (CMIP)
     elif cvdpRegex.search(variable):
         filterTerm = model+'\.cvdp_data\..*\.nc'
         directory = constructDirectoryPath(model, 'CVDP', test)
@@ -165,14 +169,13 @@ def loadModelData(model, variable, test,*args, **kargs):
     #elif test=='past1000' or test=='historical' or test=='piControl':
     else:
         # psl_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc
-        #This line might need adjusting to include physics versions?
         filterTerm = variable + '_.*?'+model+'_'+test+'_'+variant+'_.*?\.nc' # if CMIP table not specified, its assumed from .+?
         directory = constructDirectoryPath(test, 'MON', variable)
 
 #Second get an list of paths for that filer term and directory    
     paths = getFilePaths(directory, filterTerm)
 
-    #try online from esgf
+    #if nothing try online from esgf
     if len(paths)==0:
         esgfDownloader(model, variable, test, variant)
         paths = getFilePaths(directory, filterTerm)
@@ -270,12 +273,7 @@ def awsDownloader(model, varname, test, variant ):
         print("file not found on AWS")
     return fileList
                 
-def institutionFinder(model) :
-    for i in numpy.arange(0, len(_model.scenarioMIP)):
-        if model==_model.scenarioMIP[i,1]:
-            return _model.scenarioMIP[i,0]
-        
-    raise EnvironmentError("Institution not found for this model")
+
     
     
 def esgfDownloader(model, varname, test, variant ):
@@ -286,19 +284,21 @@ def esgfDownloader(model, varname, test, variant ):
     #conn = SearchConnection('https://esgf.nci.org.au/esg-search')
 
     ctx = conn.new_context(
+        latest=True,
         project='CMIP6', 
         source_id=model, 
         experiment_id=test, 
         variable=varname.split('_')[0], 
         frequency='mon', 
         variant_label=variant,
+        #data_node='esgf.nci.org.au'
     )
 
     results = ctx.search()
     
     if len(results)==0:
-        print("file not found on ESGF")
-        return False
+        print(model+varname+test+variant+" file not found on ESGF")
+        #return False
 
     for result in results:
         print(result.dataset_id +' downloading')
@@ -307,12 +307,13 @@ def esgfDownloader(model, varname, test, variant ):
             writer.write(
                 result.file_context().get_download_script()
             )
-        #import os
-
-        #os.chmod('dl.sh', 0o750)
-        print(
+        
+        try:
             check_output('bash ./'+model+varname+test+'dl.sh -s', shell=True, cwd=basePath()+'CMIP6')
-        )
-
+        except Exception as e:
+            #Sometimes it may produce an empty file
+            #By catching the exception we can keep going and hope to find the same file on another node (in the results list)
+            print(e)
+            
      
     return True

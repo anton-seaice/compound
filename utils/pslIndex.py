@@ -30,12 +30,8 @@ def calculateClimatology(climatDs, *args):
     #tidy up input data so the variable names are common between CMIP and CESM
     if any([hasattr(climatDs, 'project_id'), hasattr(climatDs, 'mip_era')]):
         if climatDs.mip_era=='CMIP6':
-            print('Ds looks like CMIP6')
             climatDs=climatDs.rename_vars({'psl':'PSL'})
-    else:
-        print('Ds looks like CESM') #CESM-LME
-        
-        
+
     #output Ds
     climatologyDs=xarray.Dataset(coords={"time":climatDs.time})
     
@@ -98,7 +94,6 @@ def calculateSamIndex(ds, *args):
     #tidy up input data so the variable names are common between CMIP and CESM
     if any([hasattr(ds, 'project_id'), hasattr(ds, 'mip_era')]):
         if ds.mip_era=='CMIP6':
-           # print('Ds looks like CMIP6')
             ds=ds.rename_vars({'psl':'PSL'})
     else:
         print('Ds looks like CESM') #CESM-LME

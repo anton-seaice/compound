@@ -14,11 +14,11 @@ cesmNoRepeats = [*cesmRcp85, '001','004','005','006','007','010','011','012','01
 
 #cmip6
 
-scenarioMIP=modelSet=numpy.array([
-    #['CSIRO-ARCCSS', 'ACCESS-CM2'],
-    #['CSIRO', 'ACCESS-ESM1-5'],
+scenarioMIP=numpy.array([
+    ['CSIRO-ARCCSS', 'ACCESS-CM2'],
+    ['CSIRO', 'ACCESS-ESM1-5'],
     ['AWI', 'AWI-CM-1-1-MR'],
-    #['BCC', 'BCC-CSM2-MR'],
+    ['BCC', 'BCC-CSM2-MR'],
     ['CAMS', 'CAMS-CSM1-0'],
     ['CAS', 'CAS-ESM2-0'],
     ['NCAR', 'CESM2'],
