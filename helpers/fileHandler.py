@@ -1,51 +1,36 @@
-#This is multi-dimensional array handling
-import xarray
-
-#This is file handling
 from os import listdir
+import re #regex
 
-#Import regex 
-import re
-
-
-
-#Import logging
-import logging
-
-# Import cvdp time function
-import sys
-sys.path.append('../')
-import helpers.cvdpTime as cvdpTime
-
-import utils._modelDefinitions as _model
-
+#python number and array handling
 import cftime
 import pandas
-
 import numpy
+import xarray
+
+# Import my functions
+from sys import path
+path.append('../')
+import helpers.cvdpTime as cvdpTime
+import utils._modelDefinitions as _model
+import helpers.esgfClient as esgfClient
+from helpers.basePath import basePath
 
 def institutionFinder(model) :
     """ Find the instituion for this model and return it"""
-    
-    
     for i in numpy.arange(0, len(_model.scenarioMIP)):
         if model==_model.scenarioMIP[i,1]:
             return _model.scenarioMIP[i,0]
-        
     raise EnvironmentError("Institution not found for this model")
 
 def to_365day_monthly(da):
-    '''Takes a DataArray. Change the 
-    calendar to 365_day and precision to monthly.'''
+    '''Takes a DataArray. Change the calendar to 365_day and precision to monthly.'''
     val = da.copy()
     time1 = da.time.copy()
     for itime in range(val.sizes['time']):
         bb = val.time.values[itime].timetuple()
         time1.values[itime] = cftime.DatetimeNoLeap(bb[0],bb[1],16)
-
     val = val.assign_coords({'time':time1})
     return val
-
 
 def basePath():
     """This is to figure out which computer this is running on""" 
@@ -85,7 +70,7 @@ def getFilePaths(directory, *args):
     try:
         fileList = listdir(directory)
     except:
-        raise EnvironmentError("Requested files " + directory + " not found. Is the harddrive plugged in and does this test case exist?")
+        raise EnvironmentError("Requested files " + directory + " not found. Is the harddrive plugged in?")
     
     # Get list of files from model run of interest accoding to the filter term
     regex = re.compile(filterTerm)
@@ -124,8 +109,6 @@ def constructDirectoryPath(model, outputType, *args):
         else:
             directory = 'CMIP6/'
        
-        #raise EnvironmentError("Selected model not found")
-    
     return directory
 
 def loadModelData(model, variable, test,*args, **kargs):
@@ -136,7 +119,6 @@ def loadModelData(model, variable, test,*args, **kargs):
     test = name of model run, e.g. '001', or 'ORBITAL.003'
     
     """
-    
     #make a regex to compare the variable name against, as cvdp is a special case.
     cvdpRegex=re.compile('cvdp')
     
@@ -162,13 +144,12 @@ def loadModelData(model, variable, test,*args, **kargs):
     
     #CVDP for other models (CMIP)
     elif cvdpRegex.search(variable):
-        filterTerm = model+'\.cvdp_data\..*\.nc'
+        filterTerm = model+'_'+variant+'\.cvdp_data\..*\.nc'
         directory = constructDirectoryPath(model, 'CVDP', test)
     
     #other cmip5
     #elif test=='past1000' or test=='historical' or test=='piControl':
     else:
-        # psl_Amon_CCSM4_piControl_r1i1p1_025001-050012.nc
         filterTerm = variable + '_.*?'+model+'_'+test+'_'+variant+'_.*?\.nc' # if CMIP table not specified, its assumed from .+?
         directory = constructDirectoryPath(test, 'MON', variable)
 
@@ -177,7 +158,7 @@ def loadModelData(model, variable, test,*args, **kargs):
 
     #if nothing try online from esgf
     if len(paths)==0:
-        esgfDownloader(model, variable, test, variant)
+        esgfClient.esgfDownloader(model, variable, test, variant)
         paths = getFilePaths(directory, filterTerm)
     
     # throw an error if we still didn't find any files      
@@ -196,124 +177,24 @@ def loadModelData(model, variable, test,*args, **kargs):
             result = xarray.open_mfdataset(paths, parallel=True, **kargs)
             result['time'] = result['time']-pandas.to_timedelta(1, unit='d')
     else:
-        # basically a place holder for other model types.
+        # other model types.
         result = xarray.open_mfdataset(paths, parallel=True, use_cftime=True, **kargs)
 
+        #If there is a time coord, then make it monthly using 365 cal
         timeRe=re.compile('time')
         cfTimeRe=re.compile('cftime._cftime.DatetimeNoLeap')
-        
         for i in list(result.coords) :
             if timeRe.search(i) :
                 if not(cfTimeRe.search(str(type(result.time.values[0])))):
                     result = to_365day_monthly(result)
+                    
+    #Fourth - make some dumb corrections
+    if model=='MCM-UA-1-0':
+        result=result.rename({'longitude':'lon', 'latitude':'lat'})
         
-    #print("Files imported: \n",paths)
-    
     return result
 
 
-def awsDownloader(model, varname, test, variant ): 
 
-    import boto3
-    import botocore
-    import s3fs
-    
-    #source: https://github.com/aradhakrishnanGFDL/gfdl-aws-analysis/blob/community/examples/s3_list_example.py
-
-    '''
-    This script provides an example on how to list files (all Amon tas fields in the gfdl-esgf bucket) in the gfdl-esgf bucket with anonymous access
-    You can edit the prefix, delimiters, search facets such as miptable/varname as you see fit.
-    '''
-    
-    
-    region = 'us-east-2'
-    s3client = boto3.client('s3',region_name=region,
-                            config=botocore.client.Config(signature_version=botocore.UNSIGNED)
-                           )
-
-    paginator = s3client.get_paginator('list_objects')
-
-    source_bucket = 'esgf-world'
-
-    #miptable = "Amon"
-    s3prefix = "s3:/"
-
-    #pat = re.compile(r'key\/.+\/<pattern>\/.+.gz')
-
-    fileObjs = list()
-
-    fs_s3 = s3fs.S3FileSystem(anon=True)
-
-    if any([test=='historical', test=='piControl']):
-        source_prefix='CMIP6/CMIP/'
-    elif test.find('ssp')>=0:
-        source_prefix='CMIP6/ScenarioMIP/'
-    
-    source_prefix = source_prefix + institutionFinder(model) +'/'+ model +'/'+ test + '/' + variant
-    print(source_prefix)
-
-    fileList=list()
-    
-    for result in paginator.paginate(Bucket=source_bucket, Prefix=source_prefix, Delimiter='.nc'):
-        for prefixes in result.get('CommonPrefixes'):
-            commonprefix = prefixes.get('Prefix')
-            searchpath = commonprefix
-
-     #       print(searchpath)
-            pat = re.compile('({}/{}/)'.format(varname.split('_')[1],varname.split('_')[0]))
-            m = re.search(pat, searchpath)
-            if m is not None:
-                lst = commonprefix.split('/')
-                print('Downloading ' + lst[-1])
-                path=('{}/{}/{}'.format(s3prefix,source_bucket,commonprefix))
-                fs_s3.download(path, basePath()+'CMIP6/'+lst[-1])
-                fileList.append(basePath()+'CMIP6/'+lst[-1])
-                
-    if len(fileList)==0:
-        print("file not found on AWS")
-    return fileList
-                
 
     
-    
-def esgfDownloader(model, varname, test, variant ):
-    from pyesgf.search import SearchConnection
-    from subprocess import check_output
-    
-    conn = SearchConnection('https://esgf-data.dkrz.de/esg-search')
-    #conn = SearchConnection('https://esgf.nci.org.au/esg-search')
-
-    ctx = conn.new_context(
-        latest=True,
-        project='CMIP6', 
-        source_id=model, 
-        experiment_id=test, 
-        variable=varname.split('_')[0], 
-        frequency='mon', 
-        variant_label=variant,
-        #data_node='esgf.nci.org.au'
-    )
-
-    results = ctx.search()
-    
-    if len(results)==0:
-        print(model+varname+test+variant+" file not found on ESGF")
-        #return False
-
-    for result in results:
-        print(result.dataset_id +' downloading')
-
-        with open(basePath()+'CMIP6/'+model+varname+test+'dl.sh', "w") as writer:
-            writer.write(
-                result.file_context().get_download_script()
-            )
-        
-        try:
-            check_output('bash ./'+model+varname+test+'dl.sh -s', shell=True, cwd=basePath()+'CMIP6')
-        except Exception as e:
-            #Sometimes it may produce an empty file
-            #By catching the exception we can keep going and hope to find the same file on another node (in the results list)
-            print(e)
-            
-     
-    return True
