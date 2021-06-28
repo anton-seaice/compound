@@ -55,3 +55,32 @@ def binSum(da):
     return overlapBinDa
 
 
+
+def binPlot(da):
+    import matplotlib.pyplot as plt
+    
+    toPlot=[ #*firePos.attrs['indeces'],
+        *da.attrs['pairs'],'all3']
+    colors=['orange', 'purple', 'green','blue']
+    
+    dims = list(da.coords)
+    dims.remove('year')
+    
+    plt.figure(figsize=(18,6))
+
+    for counter in range(0,len(toPlot)):
+        plt.vlines(
+            x=da.year-len(toPlot)+1.5*counter, 
+            ymin=0,
+            ymax=da[toPlot[counter]].mean(dims),
+            label=toPlot[counter],
+            color=colors[counter]
+        )
+
+    plt.legend(loc='upper left')
+    plt.xticks(ticks=da.year)
+    plt.xlabel('Mid-point of 30 year bin')
+    plt.ylim(0,8)
+    plt.ylabel('Number of events (mean)')
+    #plt.title('Pairs and all-three for runs with ' + str(expSet))
+    plt.minorticks_on()
