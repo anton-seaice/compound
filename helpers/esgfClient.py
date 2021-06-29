@@ -15,7 +15,8 @@ def esgfDownloader(model, varname, test, variant ):
     from subprocess import check_output
     
     #The German API connection seems better than the NCI one (more reliable/up to date, so i've been using that. (Maybe its slow?))
-    conn = SearchConnection('https://esgf-data.dkrz.de/esg-search')
+    #conn = SearchConnection('https://esgf-data.dkrz.de/esg-search')
+    conn = SearchConnection('https://esgf-node.llnl.gov/esg-search')
     #conn = SearchConnection('https://esgf.nci.org.au/esg-search')
 
     #Search query on the server. I think this is run server side.
@@ -37,9 +38,8 @@ def esgfDownloader(model, varname, test, variant ):
     results = ctx.search()
     
     #This line doesn't work reliably??
-    if len(results)==0:
+    if ctx.hit_count==0:
         print(model+varname+test+variant+" file not found on ESGF")
-        #return False
 
         # The results include every data_node this can be sourced from, so trying to download from every node is somewhat wasteful. However, sometimes a node is down, so this means it will try every node.
         #For every result, grab the Wget script and run it.
@@ -52,7 +52,7 @@ def esgfDownloader(model, varname, test, variant ):
             )
         try:
             #There is in annoying feature where this bash file will almost infinitely (esp if there are lots of files) retry the same data node if it doesn't get a response. A better behaviour would be to kill the script and move onto another node.
-            check_output('bash ./'+model+varname+test+'dl.sh -s', shell=True, cwd=basePath()+'CMIP6')
+            check_output('bash ./'+model+varname+test+'dl.sh -s &', shell=True, cwd=basePath()+'CMIP6')
         except Exception as e:
             print(e)
             #Sometimes it may produce an empty file
