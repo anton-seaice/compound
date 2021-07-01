@@ -29,7 +29,6 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     ['CMCC', 'CMCC-CM2-SR5', 'r1i1p1f1', 'r1i1p1f1'],
     ['CMCC', 'CMCC-ESM2', 'r1i1p1f1', 'r1i1p1f1'],
     ['CNRM-CERFACS', 'CNRM-CM6-1', 'r1i1p1f2', 'r1i1p1f2'],
-    ['CNRM-CERFACS', 'CNRM-CM6-1-HR', 'r1i1p1f2', 'r1i1p1f2'],
     ['CNRM-CERFACS', 'CNRM-ESM2-1', 'r1i1p1f2', 'r1i1p1f2'],
     ['CCCma', 'CanESM5', 'r1i1p1f1', 'r1i1p1f1'],
     ['CCCma', 'CanESM5-CanOE', 'r1i1p2f1', 'r1i1p2f1'],
@@ -68,6 +67,7 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     #piControl < 500 years
     #['E3SM-Project', 'E3SM-1-1', 'r1i1p1f1', 'r1i1p1f1'],
     #['CCCR-IITM', 'IITM-ESM', 'r1i1p1f1', 'r1i1p1f1'],
+    #['CNRM-CERFACS', 'CNRM-CM6-1-HR', 'r1i1p1f2', 'r1i1p1f2'],
     
     
 #cmip5
