@@ -20,8 +20,12 @@ def applyCriteria(indexDa, critDa):
     indexNames=list(critDa.variables)
     
     firePos=list(set(_index.firePos).intersection(indexNames))
+    print('firePos: ')
+    print(firePos)
     fireNeg=list(set(_index.fireNeg).intersection(indexNames))
-
+    print('fireNeg: ')
+    print(fireNeg)
+    
     #events are greater than or less than the criteria
     #doing a comparison with a Nan retruns false, when its easier if its still a Nan, so put the where in to look for nans
     posEvents=(indexDa>critDa).where(indexDa.isnull()!=True)

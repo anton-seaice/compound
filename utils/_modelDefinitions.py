@@ -33,7 +33,6 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     ['CNRM-CERFACS', 'CNRM-ESM2-1', 'r1i1p1f2', 'r1i1p1f2'],
     ['CCCma', 'CanESM5', 'r1i1p1f1', 'r1i1p1f1'],
     ['CCCma', 'CanESM5-CanOE', 'r1i1p2f1', 'r1i1p2f1'],
-    ['E3SM-Project', 'E3SM-1-1', 'r1i1p1f1', 'r1i1p1f1'],
     ['EC-Earth-Consortium', 'EC-Earth3', 'r1i1p1f1', 'r1i1p1f1'],
     ['EC-Earth-Consortium', 'EC-Earth3-CC', 'r1i1p1f1', 'r1i1p1f1'],
     ['EC-Earth-Consortium', 'EC-Earth3-Veg', 'r1i1p1f1', 'r1i1p1f1'],
@@ -44,7 +43,6 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     ['NASA-GISS', 'GISS-E2-1-G', 'r1i1p1f2', 'r1i1p1f2'],
     ['MOHC', 'HadGEM3-GC31-LL', 'r1i1p1f1', 'r1i1p1f3'], #NB the piControl used a slightly older version of the forcings.
     ['MOHC', 'HadGEM3-GC31-MM', 'r1i1p1f1', 'r1i1p1f3'],
-    ['CCCR-IITM', 'IITM-ESM', 'r1i1p1f1', 'r1i1p1f1'],
     ['INM', 'INM-CM4-8', 'r1i1p1f1', 'r1i1p1f1'],
     ['INM', 'INM-CM5-0', 'r1i1p1f1', 'r1i1p1f1'],
     ['IPSL', 'IPSL-CM6A-LR', 'r1i1p1f1', 'r1i1p1f1'],
@@ -67,6 +65,11 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     #['IPSL', 'IPSL-CM5A2-INCA', 'r1i1p1f1', 'r1i1p1f1'],
     #['HAMMOZ-Consortium', 'MPI-ESM-1-2-HAM', 'r1i1p1f1', 'r1i1p1f1'],
 
+    #piControl < 500 years
+    #['E3SM-Project', 'E3SM-1-1', 'r1i1p1f1', 'r1i1p1f1'],
+    #['CCCR-IITM', 'IITM-ESM', 'r1i1p1f1', 'r1i1p1f1'],
+    
+    
 #cmip5
 
 past1000 = [

@@ -33,7 +33,8 @@ monthsOfInterest = {
     "lat1" : [10, 15],
     "lat2" : [10, 15],
     "precAnom" : [10, 15] ,
-    "tsAnom" : [10, 15]
+    "tsAnom" : [10, 15], 
+    "enso" : [12,14]
 }
 
 nDaysOfInterest = {
