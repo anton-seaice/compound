@@ -185,7 +185,7 @@ def loadModelData(model, variable, test,*args, **kargs):
         cfTimeRe=re.compile('cftime._cftime.DatetimeNoLeap')
         for i in list(result.coords) :
             if timeRe.search(i) :
-                if not(cfTimeRe.search(str(type(result.time.values[0])))):
+                #if not(cfTimeRe.search(str(type(result.time.values[0])))):
                     result = to_365day_monthly(result)
                     
     #Fourth - make some dumb corrections
