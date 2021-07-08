@@ -165,7 +165,7 @@ def loadModelData(model, variable, test,*args, **kargs):
     if len(paths)==0:
         raise EnvironmentError("Files (filter term: " + filterTerm + " ) not found, possibly test name is wrong")
 
-   # print(paths)
+    #print(paths)
         
 #Third, open the Xr
     if cvdpRegex.search(variable):
@@ -174,11 +174,11 @@ def loadModelData(model, variable, test,*args, **kargs):
         result = cvdpTime.decodeTime(result)
     elif model == 'CESM-LME':
             #special case for CESM, as the dates are one day later then you expect. (i.e. the average for the first month of 850 is associated with the time co-ord of 1-Feb-850)
-            result = xarray.open_mfdataset(paths, parallel=True, **kargs)
+            result = xarray.open_mfdataset(paths, **kargs)
             result['time'] = result['time']-pandas.to_timedelta(1, unit='d')
     else:
         # other model types.
-        result = xarray.open_mfdataset(paths, parallel=True, use_cftime=True, **kargs)
+        result = xarray.open_mfdataset(paths, use_cftime=True, **kargs)
 
         #If there is a time coord, then make it monthly using 365 cal
         timeRe=re.compile('time')
@@ -189,9 +189,14 @@ def loadModelData(model, variable, test,*args, **kargs):
                     result = to_365day_monthly(result)
                     
     #Fourth - make some dumb corrections
-    if model=='MCM-UA-1-0':
-        result=result.rename({'longitude':'lon', 'latitude':'lat'})
-        
+    #most model use 'lon' and 'lat', so use these if they have used 'longitude' and 'latitude'
+    latRe=re.compile('latitude')
+    matches = [latRe.search(string) for string in list(result.coords)]
+    for m in matches:
+        if m!=None:
+             if m.span()==(0,8): #this is a weid way of matching?
+                    result=result.rename({'latitude':'lat', 
+                                'longitude':'lon'})
     return result
 
 

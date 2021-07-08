@@ -3,7 +3,7 @@ from sys import path
 path.append('../')
 from helpers.basePath import basePath
 
-def esgfDownloader(model, varname, test, variant ):
+def esgfDownloader(model, varname, test, variant, *kwargs ):
     
     """Access esgf through the API search tool and download the result.
     
@@ -30,6 +30,7 @@ def esgfDownloader(model, varname, test, variant ):
         table_id=varname.split('_')[1], 
         frequency='mon', 
         variant_label=variant,
+        grid_label='gn'
         #data_node='esgf.nci.org.au'
         #data_node='esgf-data1.llnl.gov'
     )

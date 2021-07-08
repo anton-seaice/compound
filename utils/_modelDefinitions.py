@@ -45,7 +45,6 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     ['INM', 'INM-CM5-0', 'r1i1p1f1', 'r1i1p1f1'],
     ['IPSL', 'IPSL-CM6A-LR', 'r1i1p1f1', 'r1i1p1f1'],
     ['NIMS-KMA', 'KACE-1-0-G', 'r1i1p1f1', 'r1i1p1f1'],
-    ['KIOST', 'KIOST-ESM', 'r1i1p1f1', 'r1i1p1f1'],
     ['UA', 'MCM-UA-1-0', 'r1i1p1f1', 'r1i1p1f2'],
     ['MIROC', 'MIROC-ES2L', 'r1i1p1f2', 'r1i1p1f2'],
     ['MIROC', 'MIROC6', 'r1i1p1f1', 'r1i1p1f1'],
@@ -70,6 +69,7 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     
     #no Pr!
     #['FIO-QLNM', 'FIO-ESM-2-0', 'r1i1p1f1', 'r1i1p1f1'],
+    #['KIOST', 'KIOST-ESM', 'r1i1p1f1', 'r1i1p1f1'],
     
     
 #cmip5
