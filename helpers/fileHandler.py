@@ -197,6 +197,10 @@ def loadModelData(model, variable, test,*args, **kargs):
              if m.span()==(0,8): #this is a weid way of matching?
                     result=result.rename({'latitude':'lat', 
                                 'longitude':'lon'})
+    #standardise all models to use 0 to 360E (instead of -180 to 180)                
+    result['lon']=(result.lon.where(result.lon<0)+360)
+
+    
     return result
 
 
