@@ -1,4 +1,3 @@
-from os import listdir
 import re #regex
 
 #python number and array handling
@@ -15,11 +14,14 @@ import utils._modelDefinitions as _model
 import helpers.esgfClient as esgfClient
 from helpers.basePath import basePath
 
+from platform import node
+
+
 def institutionFinder(model) :
     """ Find the instituion for this model and return it"""
-    for i in numpy.arange(0, len(_model.scenarioMIP)):
-        if model==_model.scenarioMIP[i,1]:
-            return _model.scenarioMIP[i,0]
+    for i in numpy.arange(0, len(_model.scenarioMip)):
+        if model==_model.scenarioMip[i,1]:
+            return _model.scenarioMip[i,0]
     raise EnvironmentError("Institution not found for this model")
 
 def to_365day_monthly(da):
@@ -32,18 +34,6 @@ def to_365day_monthly(da):
     val = val.assign_coords({'time':time1})
     return val
 
-def basePath():
-    """This is to figure out which computer this is running on""" 
-    from platform import system
-    operatingSystem = system()
-    if operatingSystem == 'Windows':
-        return 'E:/CMIP5-PMIP3/'
-    if operatingSystem == 'Linux':
-        return '/mnt/e/CMIP5-PMIP3/'
-    elif operatingSystem == 'Darwin':
-        return '/Volumes/Untitled/CMIP5-PMIP3/'  
-    else:
-        raise EnvironmentError("Can't find where to look for data files. Operating System is " + operatingSystem)
         
 def getFilePaths(directory, *args):
     """Returns a list of absolute paths from a chosen directory
@@ -55,6 +45,8 @@ def getFilePaths(directory, *args):
     This is set-up for the developers environment
     
     """
+    
+    from os import listdir
     # First, see if there is a second argument. If there is then this is the filterTerm, otherwise its just all .nc files
     if len(args)==0:
         filterTerm = '.+\.nc'
@@ -106,6 +98,11 @@ def constructDirectoryPath(model, outputType, *args):
     else:
         if outputType == 'CVDP':
             directory = 'cmip6.'+ args[0] +'.cvdp_data/'
+        elif node().split('-')[0]=='gadi':
+            if any([model=='piControl', model=='historical']):
+                directory = 'CMIP6/CMIP/'
+            else:
+                directory = 'CMIP6/ScenarioMIP/'
         else:
             directory = 'CMIP6/'
        
@@ -119,6 +116,9 @@ def loadModelData(model, variable, test,*args, **kargs):
     test = name of model run, e.g. '001', or 'ORBITAL.003'
     
     """
+    import subprocess
+    
+    
     #make a regex to compare the variable name against, as cvdp is a special case.
     cvdpRegex=re.compile('cvdp')
     
@@ -150,22 +150,31 @@ def loadModelData(model, variable, test,*args, **kargs):
     #other cmip5
     #elif test=='past1000' or test=='historical' or test=='piControl':
     else:
-        filterTerm = variable + '_.*?'+model+'_'+test+'_'+variant+'_.*?\.nc' # if CMIP table not specified, its assumed from .+?
+        filterTerm = variable + '_.*?'+model+'_'+test+'_'+variant+'_.*'#'?\.nc' # if CMIP table not specified, its assumed from .+?
         directory = constructDirectoryPath(test, 'MON', variable)
 
-#Second get an list of paths for that filer term and directory    
-    paths = getFilePaths(directory, filterTerm)
+#Second get an list of paths for that filer term and directory  
 
-    #if nothing try online from esgf
-    if len(paths)==0:
-        esgfClient.esgfDownloader(model, variable, test, variant)
+    print(basePath()+directory)
+    print(filterTerm)
+    if node().split('-')[0]=='gadi':
+        find=(subprocess.run(['find',
+                              basePath()+directory+'/'+institutionFinder(model)+'/'+model+'/'+test+'/'+variant,
+                              '-regex',
+                              '.*\\'+filterTerm] , capture_output=True).stdout)
+        paths=find.decode("utf-8").split('\n')[:-1]
+    else:
         paths = getFilePaths(directory, filterTerm)
+        #if nothing try online from esgf
+        if len(paths)==0:
+            esgfClient.esgfDownloader(model, variable, test, variant)
+            paths = getFilePaths(directory, filterTerm)
     
     # throw an error if we still didn't find any files      
     if len(paths)==0:
         raise EnvironmentError("Files (filter term: " + filterTerm + " ) not found, possibly test name is wrong")
 
-    #print(paths)
+    print(paths)
         
 #Third, open the Xr
     if cvdpRegex.search(variable):
@@ -198,7 +207,7 @@ def loadModelData(model, variable, test,*args, **kargs):
                     result=result.rename({'latitude':'lat', 
                                 'longitude':'lon'})
     #standardise all models to use 0 to 360E (instead of -180 to 180)                
-    result['lon']=(result.lon.where(result.lon<0)+360)
+    #result['lon']=(result.lon.where(result.lon<0)+360)
 
     
     return result
