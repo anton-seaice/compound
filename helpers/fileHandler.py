@@ -124,7 +124,12 @@ def loadModelData(model, variable, test,*args, **kargs):
     
     #args might be a variant for CMIP6
     if len(args)==1:
-        variant=args[0]
+        splitter=args[0].split('_')
+        variant=splitter[0]
+        if len(splitter)==2:
+            grid=splitter[1]
+        else:
+            grid='.*?'
     else:
         variant='r1i1p1f1' #used for CMIP6 only
     
@@ -150,7 +155,7 @@ def loadModelData(model, variable, test,*args, **kargs):
     #other cmip5
     #elif test=='past1000' or test=='historical' or test=='piControl':
     else:
-        filterTerm = variable + '_.*?'+model+'_'+test+'_'+variant+'_.*'#'?\.nc' # if CMIP table not specified, its assumed from .+?
+        filterTerm = variable + '_.*?'+model+'_'+test+'_'+variant+'_'+grid+'_.*'#'?\.nc' # if CMIP table not specified, its assumed from .+?
         directory = constructDirectoryPath(test, 'MON', variable)
 
 #Second get an list of paths for that filer term and directory  
@@ -167,7 +172,7 @@ def loadModelData(model, variable, test,*args, **kargs):
         paths = getFilePaths(directory, filterTerm)
         #if nothing try online from esgf
         if len(paths)==0:
-            esgfClient.esgfDownloader(model, variable, test, variant)
+            esgfClient.esgfDownloader(model, variable, test, args[0])
             paths = getFilePaths(directory, filterTerm)
     
     # throw an error if we still didn't find any files      
