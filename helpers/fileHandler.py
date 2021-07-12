@@ -160,8 +160,8 @@ def loadModelData(model, variable, test,*args, **kargs):
 
 #Second get an list of paths for that filer term and directory  
 
-    print(basePath()+directory)
-    print(filterTerm)
+    #print(basePath()+directory)
+    #print(filterTerm)
     if node().split('-')[0]=='gadi':
         find=(subprocess.run(['find',
                               basePath()+directory+'/'+institutionFinder(model)+'/'+model+'/'+test+'/'+variant,
@@ -179,7 +179,7 @@ def loadModelData(model, variable, test,*args, **kargs):
     if len(paths)==0:
         raise EnvironmentError("Files (filter term: " + filterTerm + " ) not found, possibly test name is wrong")
 
-    print(paths)
+    #print(paths)
         
 #Third, open the Xr
     if cvdpRegex.search(variable):

@@ -30,7 +30,7 @@ def esgfDownloader(model, varname, test, variant, *kwargs ):
         table_id=varname.split('_')[1], 
         frequency='mon', 
         variant_label=variant,
-        grid_label='gn'
+        #grid_label='gn'
         #data_node='esgf.nci.org.au'
         #data_node='esgf-data1.llnl.gov'
     )
