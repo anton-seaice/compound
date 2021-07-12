@@ -136,6 +136,9 @@ def loadModelData(model, variable, test,*args, **kargs):
 #First we are going to make some file paths from the information provided.
     #CESM-LME
     if model=='CESM-LME' :
+        if node().split('-')[0]=='gadi':
+            raise EnvironmentError("CESM-LME not available on Gadi")
+
         #for CESM, make a filter term for file names, and make a directory
         #exampleFilterTerm = 'b\.e11\.BLMTRC5CN\.f19_g16.001\.pop\.h\.SST\..+\.nc'
         filterTerm = 'b\.e11\.B.*?\.f19_g16\.' + test + '\..*?' + variable + '\..+\.nc'
@@ -163,10 +166,12 @@ def loadModelData(model, variable, test,*args, **kargs):
     #print(basePath()+directory)
     #print(filterTerm)
     if node().split('-')[0]=='gadi':
-        find=(subprocess.run(['find',
-                              basePath()+directory+'/'+institutionFinder(model)+'/'+model+'/'+test+'/'+variant,
-                              '-regex',
-                              '.*\\'+filterTerm] , capture_output=True).stdout)
+        if model.split('-')[0]=='ACCESS':
+            path='/g/data/fs38/publications/'+directory+'/'+institutionFinder(model)+'/'+model+'/'+test+'/'+variant+'/'+variable.split('_')[1]+'/'+variable.split('_')[0]+'/'+grid+'/latest/'
+        else:
+            path='/g/data/oi10/replicas/'+directory+'/'+institutionFinder(model)+'/'+model+'/'+test+'/'+variant
+        find=(subprocess.run(['find',path,'-regex','.*\\'+filterTerm],
+                             capture_output=True).stdout)
         paths=find.decode("utf-8").split('\n')[:-1]
     else:
         paths = getFilePaths(directory, filterTerm)
@@ -179,7 +184,7 @@ def loadModelData(model, variable, test,*args, **kargs):
     if len(paths)==0:
         raise EnvironmentError("Files (filter term: " + filterTerm + " ) not found, possibly test name is wrong")
 
-    #print(paths)
+    # print(paths)
         
 #Third, open the Xr
     if cvdpRegex.search(variable):
@@ -209,8 +214,11 @@ def loadModelData(model, variable, test,*args, **kargs):
     for m in matches:
         if m!=None:
              if m.span()==(0,8): #this is a weid way of matching?
-                    result=result.rename({'latitude':'lat', 
+                    try:
+                        result=result.rename({'latitude':'lat', 
                                 'longitude':'lon'})
+                    except:
+                        print('Warning: could not replace latitude with lat')
     #standardise all models to use 0 to 360E (instead of -180 to 180)                
     result['lon']=((result.lon + 360) % 360)
 

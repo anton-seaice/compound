@@ -17,8 +17,8 @@ deckSet=['piControl']#,'historical']
 scenarioSet=['historical','ssp126', 'ssp245', 'ssp370','ssp585']
 experimentSet=[*deckSet, *scenarioSet]
 scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
-    ['CSIRO-ARCCSS', 'ACCESS-CM2', 'r1i1p1f1', 'r1i1p1f1'],
-    ['CSIRO', 'ACCESS-ESM1-5', 'r1i1p1f1', 'r1i1p1f1'],
+    ['CSIRO-ARCCSS', 'ACCESS-CM2', 'r1i1p1f1_gn', 'r1i1p1f1_gn'],
+    ['CSIRO', 'ACCESS-ESM1-5', 'r1i1p1f1_gn', 'r1i1p1f1_gn'],
     ['AWI', 'AWI-CM-1-1-MR', 'r1i1p1f1', 'r1i1p1f1'],
     ['BCC', 'BCC-CSM2-MR', 'r1i1p1f1', 'r1i1p1f1'],
     ['CAMS', 'CAMS-CSM1-0', 'r1i1p1f1', 'r1i1p1f1'],
@@ -28,8 +28,8 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     ['THU', 'CIESM', 'r1i1p1f1', 'r1i1p1f1'],
     ['CMCC', 'CMCC-CM2-SR5', 'r1i1p1f1', 'r1i1p1f1'],
     ['CMCC', 'CMCC-ESM2', 'r1i1p1f1', 'r1i1p1f1'],
-    ['CNRM-CERFACS', 'CNRM-CM6-1', 'r1i1p1f2_gr1', 'r1i1p1f2_gr1'],
-    ['CNRM-CERFACS', 'CNRM-ESM2-1', 'r1i1p1f2', 'r1i1p1f2'],
+    ['CNRM-CERFACS', 'CNRM-CM6-1', 'r1i1p1f2_gn', 'r1i1p1f2_gn'],
+    ['CNRM-CERFACS', 'CNRM-ESM2-1', 'r1i1p1f2_gn', 'r1i1p1f2_gn'],
     ['CCCma', 'CanESM5', 'r1i1p1f1', 'r1i1p1f1'],
     ['CCCma', 'CanESM5-CanOE', 'r1i1p2f1', 'r1i1p2f1'],
     ['EC-Earth-Consortium', 'EC-Earth3', 'r1i1p1f1', 'r1i1p1f1'],
@@ -46,7 +46,7 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     ['IPSL', 'IPSL-CM6A-LR', 'r1i1p1f1', 'r1i1p1f1'],
     ['NIMS-KMA', 'KACE-1-0-G', 'r1i1p1f1', 'r1i1p1f1'],
     ['UA', 'MCM-UA-1-0', 'r1i1p1f1', 'r1i1p1f2'],
-    ['MIROC', 'MIROC-ES2L', 'r1i1p1f2', 'r1i1p1f2'],
+    ['MIROC', 'MIROC-ES2L', 'r1i1p1f2_gn', 'r1i1p1f2_gn'],
     ['MIROC', 'MIROC6', 'r1i1p1f1', 'r1i1p1f1'],
     ['MPI-M', 'MPI-ESM1-2-HR', 'r1i1p1f1', 'r1i1p1f1'],
     ['MPI-M', 'MPI-ESM1-2-LR', 'r1i1p1f1', 'r1i1p1f1'],
