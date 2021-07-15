@@ -163,13 +163,15 @@ def loadModelData(model, variable, test,*args, **kargs):
 
 #Second get an list of paths for that filer term and directory  
 
-    #print(basePath()+directory)
-    #print(filterTerm)
     if node().split('-')[0]=='gadi':
         if model.split('-')[0]=='ACCESS':
             path='/g/data/fs38/publications/'+directory+'/'+institutionFinder(model)+'/'+model+'/'+test+'/'+variant+'/'+variable.split('_')[1]+'/'+variable.split('_')[0]+'/'+grid+'/latest/'
         else:
-            path='/g/data/oi10/replicas/'+directory+'/'+institutionFinder(model)+'/'+model+'/'+test+'/'+variant
+            path='/g/data/oi10/replicas/'+directory+'/'+institutionFinder(model)+'/'+model+'/'+test+'/'+variant+'/'+variable.split('_')[1]+'/'+variable.split('_')[0]+'/'+grid+'/'
+            ls = (subprocess.run(['ls',path],
+                                 capture_output=True).stdout)
+            dateFolder=ls.decode("utf-8").split('\n')[0]
+            path = path + dateFolder
         find=(subprocess.run(['find',path,'-regex','.*\\'+filterTerm],
                              capture_output=True).stdout)
         paths=find.decode("utf-8").split('\n')[:-1]
