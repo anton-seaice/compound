@@ -19,7 +19,6 @@ experimentSet=[*deckSet, *scenarioSet]
 scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     ['CSIRO-ARCCSS', 'ACCESS-CM2', 'r1i1p1f1_gn', 'r1i1p1f1_gn'],
     ['CSIRO', 'ACCESS-ESM1-5', 'r1i1p1f1_gn', 'r1i1p1f1_gn'],
-    ['AWI', 'AWI-CM-1-1-MR', 'r1i1p1f1', 'r1i1p1f1'],
     ['BCC', 'BCC-CSM2-MR', 'r1i1p1f1', 'r1i1p1f1'],
     ['CAMS', 'CAMS-CSM1-0', 'r1i1p1f1', 'r1i1p1f1'],
     ['CAS', 'CAS-ESM2-0', 'r1i1p1f1', 'r1i1p1f1'],
@@ -28,14 +27,15 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     ['THU', 'CIESM', 'r1i1p1f1', 'r1i1p1f1'],
     ['CMCC', 'CMCC-CM2-SR5', 'r1i1p1f1', 'r1i1p1f1'],
     ['CMCC', 'CMCC-ESM2', 'r1i1p1f1', 'r1i1p1f1'],
-    ['CNRM-CERFACS', 'CNRM-CM6-1', 'r1i1p1f2_gn', 'r1i1p1f2_gn'],
-    ['CNRM-CERFACS', 'CNRM-ESM2-1', 'r1i1p1f2_gn', 'r1i1p1f2_gn'],
+    ['CNRM-CERFACS', 'CNRM-CM6-1', 'r1i1p1f2', 'r1i1p1f2'],
+    ['CNRM-CERFACS', 'CNRM-ESM2-1', 'r1i1p1f2', 'r1i1p1f2'],
     ['CCCma', 'CanESM5', 'r1i1p1f1', 'r1i1p1f1'],
     ['CCCma', 'CanESM5-CanOE', 'r1i1p2f1', 'r1i1p2f1'],
     ['EC-Earth-Consortium', 'EC-Earth3', 'r1i1p1f1', 'r1i1p1f1'],
     ['EC-Earth-Consortium', 'EC-Earth3-CC', 'r1i1p1f1', 'r1i1p1f1'],
     ['EC-Earth-Consortium', 'EC-Earth3-Veg', 'r1i1p1f1', 'r1i1p1f1'],
     ['EC-Earth-Consortium', 'EC-Earth3-Veg-LR', 'r1i1p1f1', 'r1i1p1f1'],
+    ['FIO-QLNM','FIO-ESM-2-0','r1i1p1f1','r1i1p1f1'],
     ['NOAA-GFDL', 'GFDL-CM4', 'r1i1p1f1', 'r1i1p1f1'],
     ['NOAA-GFDL', 'GFDL-ESM4', 'r1i1p1f1', 'r1i1p1f1'],
     ['NASA-GISS', 'GISS-E2-1-G', 'r1i1p1f2', 'r1i1p1f2'],
@@ -50,7 +50,7 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     ['MIROC', 'MIROC6', 'r1i1p1f1', 'r1i1p1f1'],
     ['MPI-M', 'MPI-ESM1-2-HR', 'r1i1p1f1', 'r1i1p1f1'],
     ['MPI-M', 'MPI-ESM1-2-LR', 'r1i1p1f1', 'r1i1p1f1'],
-    ['MRI', 'MRI-ESM2-0', 'r1i1p1f1', 'r1i1p1f1'],
+    ['MRI', 'MRI-ESM2-0', 'r1i1p1f1_gn', 'r1i1p1f1_gn'],
     ['NUIST', 'NESM3', 'r1i1p1f1', 'r1i1p1f1'],
     ['NCC', 'NorESM2-LM', 'r1i1p1f1', 'r1i1p1f1'],
     ['NCC', 'NorESM2-MM', 'r1i1p1f1', 'r1i1p1f1'],
@@ -71,6 +71,8 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     #['FIO-QLNM', 'FIO-ESM-2-0', 'r1i1p1f1', 'r1i1p1f1'],
     #['KIOST', 'KIOST-ESM', 'r1i1p1f1', 'r1i1p1f1'],
     
+    #cutting this because its badly formatted
+    #['AWI', 'AWI-CM-1-1-MR', 'r1i1p1f1', 'r1i1p1f1'],
     
 #cmip5
 

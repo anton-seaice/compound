@@ -219,9 +219,12 @@ def loadModelData(model, variable, test,*args, **kargs):
                                 'longitude':'lon'})
                     except:
                         print('Warning: could not replace latitude with lat')
+    
+    if model=='IPSL-CM6A-LR':
+        result=result.rename({'nav_lat':'lat', 'nav_lon':'lon'})
+    
     #standardise all models to use 0 to 360E (instead of -180 to 180)                
     result['lon']=((result.lon + 360) % 360)
-
     
     return result
 

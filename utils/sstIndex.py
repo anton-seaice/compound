@@ -20,7 +20,7 @@ def sstDomain(ds, indexKey):
     #Carve out the area of interest for this index
     #https://www.cesm.ucar.edu/models/ccsm3.0/csim/RefGuide/ice_refdoc/node9.html describes TLAT/TLONG. They are in the middle of a grid square in the model.
     domainDs=ds.where(
-        (ds.TLAT>domain['latMin']) & (ds.TLAT<domain['latMax']) & (ds.TLONG>domain['longMin']) & (ds.TLONG<domain['longMax']),
+        (ds.lat>domain['latMin']) & (ds.lat<domain['latMax']) & (ds.lon>domain['longMin']) & (ds.lon<domain['longMax']),
         drop=True
     ).SST
 
@@ -43,10 +43,11 @@ def calculateClimatology(climatDs, *args):
         if (climatDs.project_id=='CMIP'):
             #print('Ds looks like CMIP')
             #Rename it to look like CESM data
-            climatDs=climatDs.rename_dims({'lat':'nlat', 'lon':'nlon'})
-            climatDs=climatDs.rename_vars({'ts':'SST',
+            #climatDs=climatDs.rename_dims({'lat':'nlat', 'lon':'nlon'})
+            climatDs=climatDs.rename_vars({'tos':'SST',
                                            #'areacella':'TAREA', 
-                                           'lat':'TLAT', 'lon':'TLONG'})
+                                           #'lat':'TLAT', 'lon':'TLONG'
+                                          })
     else:
         climatDs['SST']=climatDs.SST.isel(z_t=0)
    
@@ -105,10 +106,11 @@ def calculateIndex(ds, *args):
     if (hasattr(ds, 'project_id')):
         if (ds.project_id=='CMIP'):
             #print('Ds looks like CMIP')
-            ds=ds.rename_dims({'lat':'nlat', 'lon':'nlon'})
-            ds=ds.rename_vars({'ts':'SST',
+            #ds=ds.rename_dims({'lat':'nlat', 'lon':'nlon'})
+            ds=ds.rename_vars({'tos':'SST',
                                #'areacella':'TAREA',
-                               'lat':'TLAT', 'lon':'TLONG'})
+                               #'lat':'TLAT', 'lon':'TLONG'
+                              })
     else:
         print('Ds looks like CESM') #CESM-LME
         #There's only one depth dimension, so we will drop that
@@ -147,11 +149,11 @@ def calculateIndex(ds, *args):
 
         # to calculate an area weight average, using TAREA is best, but lots of data sets don't seem to have this, so weighting by the cosine of the latitude
         #http://xarray.pydata.org/en/stable/examples/area_weighted_temperature.html
-        weights=numpy.cos(numpy.deg2rad(domainDs.TLAT))
+        weights=numpy.cos(numpy.deg2rad(domainDs.lat))
         #weights=domainDs.TAREA
         
         #Then calculate a weighted mean
-        resultDs[key+'NoDetrend']=sstAnomDs.weighted(weights).mean(dim=('nlon','nlat'))
+        resultDs[key+'NoDetrend']=sstAnomDs.weighted(weights).mean(dim=('lon','lat'))
         
         
     # Special case for iod
