@@ -167,26 +167,28 @@ def loadModelData(model, variable, test,*args, **kargs):
         if model.split('-')[0]=='ACCESS':
             path='/g/data/fs38/publications/'+directory+'/'+institutionFinder(model)+'/'+model+'/'+test+'/'+variant+'/'+variable.split('_')[1]+'/'+variable.split('_')[0]+'/'+grid+'/latest/'
         else:
-            path='/g/data/oi10/replicas/'+directory+'/'+institutionFinder(model)+'/'+model+'/'+test+'/'+variant+'/'+variable.split('_')[1]+'/'+variable.split('_')[0]+'/'+grid+'/'
-            ls = (subprocess.run(['ls',path],
-                                 capture_output=True).stdout)
+            path='/g/data/oi10/replicas/'+directory+'/'+institutionFinder(model)+'/'+model+'/'+test+'/'+variant+'/'+variable.split('_')[1]+'/'+variable.split('_')[0]+'/'
+            if grid=='.*?':
+                grid = (subprocess.run(['ls',path], capture_output=True).stdout).decode("utf-8").split('\n')[0]
+            path = path + grid + '/'   
+            ls = (subprocess.run(['ls',path],capture_output=True).stdout)
             dateFolder=ls.decode("utf-8").split('\n')[0]
             path = path + dateFolder
         find=(subprocess.run(['find',path,'-regex','.*\\'+filterTerm],
                              capture_output=True).stdout)
         paths=find.decode("utf-8").split('\n')[:-1]
-    else:
-        paths = getFilePaths(directory, filterTerm)
-        #if nothing try online from esgf
-        if len(paths)==0:
-            esgfClient.esgfDownloader(model, variable, test, args[0])
-            paths = getFilePaths(directory, filterTerm)
     
+    if len(paths)==0:
+        paths = getFilePaths(directory, filterTerm)
+    #if nothing try online from esgf
+    if len(paths)==0:
+        esgfClient.esgfDownloader(model, variable, test, args[0])
+        paths = getFilePaths(directory, filterTerm)
     # throw an error if we still didn't find any files      
     if len(paths)==0:
         raise EnvironmentError("Files (filter term: " + filterTerm + " ) not found, possibly test name is wrong")
 
-    # print(paths)
+    print(paths)
         
 #Third, open the Xr
     if cvdpRegex.search(variable):
@@ -222,7 +224,7 @@ def loadModelData(model, variable, test,*args, **kargs):
                     except:
                         print('Warning: could not replace latitude with lat')
     
-    if model=='IPSL-CM6A-LR':
+    if all([model=='IPSL-CM6A-LR',variable.split('_')[0]=='tos']): 
         result=result.rename({'nav_lat':'lat', 'nav_lon':'lon'})
     
     #standardise all models to use 0 to 360E (instead of -180 to 180)                

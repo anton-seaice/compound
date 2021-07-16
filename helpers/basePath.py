@@ -1,7 +1,7 @@
 def basePath():
     from platform import node
     if node().split('-')[0]=='gadi':
-        return '/g/data/oi10/replicas/'    
+        return '/scratch/w35/as2285/'    
     else:
         """This is to figure out which computer this is running on""" 
         from platform import system

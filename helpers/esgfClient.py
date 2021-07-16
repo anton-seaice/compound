@@ -15,8 +15,8 @@ def esgfDownloader(model, varname, test, variant, *kwargs ):
     from subprocess import check_output
     
     #The German API connection seems better than the NCI one (more reliable/up to date, so i've been using that. (Maybe its slow?))
-    #conn = SearchConnection('https://esgf-data.dkrz.de/esg-search')
-    conn = SearchConnection('https://esgf-node.llnl.gov/esg-search')
+    conn = SearchConnection('https://esgf-data.dkrz.de/esg-search')
+    #conn = SearchConnection('https://esgf-node.llnl.gov/esg-search')
     #conn = SearchConnection('https://esgf.nci.org.au/esg-search')
 
     #Search query on the server. I think this is run server side.

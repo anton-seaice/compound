@@ -153,7 +153,8 @@ def calculateIndex(ds, *args):
         #weights=domainDs.TAREA
         
         #Then calculate a weighted mean
-        resultDs[key+'NoDetrend']=sstAnomDs.weighted(weights).mean(dim=('lon','lat'))
+        dimsNotTime=set(sstAnomDs.dims).difference(['time'])
+        resultDs[key+'NoDetrend']=sstAnomDs.weighted(weights).mean(dim=dimsNotTime)
         
         
     # Special case for iod
