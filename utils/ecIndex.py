@@ -58,25 +58,33 @@ def sstAnoms(tsXr, climatXr):
         drop=True
     )
     
-    #Rechunk so that time is all in one chunk. Not sure this is useful but it does seem to reduce memory needs
-    tsXr=tsXr.chunk(-1, 'auto', 'auto')
-    
-    #Fit a quadratic and detrend using it
-    trendXr = tsXr.polyfit('time', 2)
-    trendXr = xarray.polyval(tsXr.time, trendXr.polyfit_coefficients, 'degree')
-    detrendXr=tsXr-trendXr
+    climatXr=climatXr.where(
+        (climatXr.lat>=-15) & (climatXr.lat<=15) &
+        (climatXr.lon>=140) & (climatXr.lon<=280),
+        drop=True
+    )
     
     climatMeans=climatXr.groupby('time.month').mean(dim='time')
     
     #calculate monthly anoms.
-    sstAnomXr=detrendXr.groupby('time.month')-climatMeans
+    sstAnomXr=tsXr.groupby('time.month')-climatMeans
     
-    return sstAnomXr
+    #Rechunk so that time is all in one chunk. Not sure this is useful but it does seem to reduce memory needs
+    sstAnomXr=sstAnomXr.chunk(-1, 'auto', 'auto')
+    
+    #Fit a quadratic and detrend using it
+    trendXr = sstAnomXr.polyfit('time', 2)
+    trendXr = xarray.polyval(sstAnomXr.time, trendXr.polyfit_coefficients, 'degree')
+    detrendXr=sstAnomXr-trendXr
+    
+    
+    
+    return detrendXr
     
 
 def eofSolver(sstAnomXr): 
     
-    sstAnomXr.load()
+    sstAnomXr.compute()
     
     #weights = numpy.cos(numpy.deg2rad(sstAnomXr.lat)
     #            ).values[..., numpy.newaxis]
@@ -104,7 +112,7 @@ def ecIndex(sstAnomXr):
     pFit = poly.Polynomial.fit(pc1, pc2, 2)
     alpha = pFit.convert().coef[2]
     
-    eofsXr = solver.eofs(eofscaling=1, neofs=2)
+    eofsXr = solver.eofs(neofs=2) #eofscaling=1
     
     pFitDjf = poly.Polynomial.fit(djfPcXr.sel(mode=0), djfPcXr.sel(mode=1), 2)
     alphaDjf = pFitDjf.convert().coef[2]

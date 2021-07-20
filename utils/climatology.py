@@ -27,6 +27,8 @@ def normalise(x, xClimatology):
     xClimatology is the xarray of the time range to use for climatology
        
     """
+    x=x.chunk({'time':'auto'})
+    
     xMonthly = x.groupby('time.month')
     
     xClimatologyMean = xClimatology.groupby('time.month').mean(dim='time')

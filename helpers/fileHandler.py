@@ -165,9 +165,9 @@ def loadModelData(model, variable, test,*args, **kargs):
 
     if node().split('-')[0]=='gadi':
         if model.split('-')[0]=='ACCESS':
-            path='/g/data/fs38/publications/'+directory+'/'+institutionFinder(model)+'/'+model+'/'+test+'/'+variant+'/'+variable.split('_')[1]+'/'+variable.split('_')[0]+'/'+grid+'/latest/'
+            path='/g/data/fs38/publications/'+directory+institutionFinder(model)+'/'+model+'/'+test+'/'+variant+'/'+variable.split('_')[1]+'/'+variable.split('_')[0]+'/'+grid+'/latest/'
         else:
-            path='/g/data/oi10/replicas/'+directory+'/'+institutionFinder(model)+'/'+model+'/'+test+'/'+variant+'/'+variable.split('_')[1]+'/'+variable.split('_')[0]+'/'
+            path='/g/data/oi10/replicas/'+directory+institutionFinder(model)+'/'+model+'/'+test+'/'+variant+'/'+variable.split('_')[1]+'/'+variable.split('_')[0]+'/'
             if grid=='.*?':
                 grid = (subprocess.run(['ls',path], capture_output=True).stdout).decode("utf-8").split('\n')[0]
             path = path + grid + '/'   
@@ -177,19 +177,23 @@ def loadModelData(model, variable, test,*args, **kargs):
         find=(subprocess.run(['find',path,'-regex','.*\\'+filterTerm],
                              capture_output=True).stdout)
         paths=find.decode("utf-8").split('\n')[:-1]
-    
-    if len(paths)==0:
+        #if nothing make a request file
+        #if len(paths)==0:
+            #print('Making request file')
+            #print(subprocess.run(['cd', '~;','clef','--request','cmip6','-m', model, '-e', test, '-vl', variant,'-t', variable.split('_')[1], '-v', variable.split('_')[0]], capture_output=True).stdout)
+        if all([model=='NorESM2-MM',test=='piControl', variable=='tos_Omon']):
+            paths.remove('/g/data/oi10/replicas/CMIP6/CMIP/NCC/NorESM2-MM/piControl/r1i1p1f1/Omon/tos/gn/v20191108/tos_Omon_NorESM2-MM_piControl_r1i1p1f1_gn_145001-145012.nc')
+    else:
         paths = getFilePaths(directory, filterTerm)
-    #if nothing try online from esgf
-    if len(paths)==0:
-        esgfClient.esgfDownloader(model, variable, test, args[0])
-        paths = getFilePaths(directory, filterTerm)
+        #if nothing try online from esgf
+        if len(paths)==0:
+            esgfClient.esgfDownloader(model, variable, test, args[0])
+            paths = getFilePaths(directory, filterTerm)
     # throw an error if we still didn't find any files      
     if len(paths)==0:
+        print(paths)
         raise EnvironmentError("Files (filter term: " + filterTerm + " ) not found, possibly test name is wrong")
 
-    print(paths)
-        
 #Third, open the Xr
     if cvdpRegex.search(variable):
         #special case for cvdp, as the times are really weird

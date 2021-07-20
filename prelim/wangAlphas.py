@@ -16,9 +16,6 @@ import xarray
 import warnings
 warnings.filterwarnings('ignore')
 
-#from dask.distributed import Client, LocalCluster
-#client = Client()
-
 #the full model set
 modelSet=_model.scenarioMip
 
@@ -43,4 +40,3 @@ for iModel in modelSet:
         
     except Exception as e:
         print(e)
-

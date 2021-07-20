@@ -25,10 +25,8 @@ def binSum(da):
     interval=10
     binSize=30
 
-    numberOfBins=(endYear-startYear-binSize)/interval + 1
+    numberOfBins=numpy.floor((endYear-startYear-binSize)/interval + 1)
     
-    
-
     # for every bin
     for iBin in numpy.arange(0,numberOfBins):
         # firstYear is 850 + counter*30
