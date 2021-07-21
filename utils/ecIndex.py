@@ -6,6 +6,7 @@ import helpers.fileHandler as fh
 import utils.timePeriod as tp
 import utils._modelDefinitions as _model
 import utils._indexDefinitions as _index
+import utils.sstIndex as sst
 
 
 
@@ -51,6 +52,12 @@ def sstAnomsWang(tsXr):
 def sstAnoms(tsXr, climatXr):
     ''' sst Anoms using two datasets provided'''
     
+    #calculate average between -20 and 20 globall to detrend with
+    trendXr=sst.calculateIndex(
+                tsXr.to_dataset().assign_attrs({'project_id':'CMIP'}), 
+                sst.calculateClimatology(climatXr.to_dataset().assign_attrs({'project_id':'CMIP'}))
+                                ).backgroundSstNoDetrend.chunk('auto')
+    
     #Area of interest for ec Indeces
     tsXr=tsXr.where(
         (tsXr.lat>=-15) & (tsXr.lat<=15) &
@@ -64,17 +71,21 @@ def sstAnoms(tsXr, climatXr):
         drop=True
     )
     
+    climatXr=climatXr.chunk([-1, 'auto', 'auto'])
+    
     climatMeans=climatXr.groupby('time.month').mean(dim='time')
     
     #calculate monthly anoms.
     sstAnomXr=tsXr.groupby('time.month')-climatMeans
     
     #Rechunk so that time is all in one chunk. Not sure this is useful but it does seem to reduce memory needs
-    sstAnomXr=sstAnomXr.chunk(-1, 'auto', 'auto')
+    sstAnomXr=sstAnomXr.chunk([-1, 'auto', 'auto'])
     
     #Fit a quadratic and detrend using it
-    trendXr = sstAnomXr.polyfit('time', 2)
-    trendXr = xarray.polyval(sstAnomXr.time, trendXr.polyfit_coefficients, 'degree')
+    #trendXr = sstAnomXr.polyfit('time', 2)
+    #trendXr = xarray.polyval(sstAnomXr.time, trendXr.polyfit_coefficients, 'degree')
+    
+    
     detrendXr=sstAnomXr-trendXr
     
     
@@ -84,7 +95,7 @@ def sstAnoms(tsXr, climatXr):
 
 def eofSolver(sstAnomXr): 
     
-    sstAnomXr.compute()
+    sstAnomXr.load()
     
     #weights = numpy.cos(numpy.deg2rad(sstAnomXr.lat)
     #            ).values[..., numpy.newaxis]
@@ -100,7 +111,7 @@ def ecIndex(sstAnomXr):
     pcTimeXr=solver.pcs(npcs=2, pcscaling=1)
     
     djfAnomXr=tp.averageForTimePeriod(
-            sstAnomXr.to_dataset(name='enso')).rename({'year':'time'}).enso
+            sstAnomXr.to_dataset(name='enso')).rename({'year':'time'}).enso.chunk('auto')
 
     solver=eofSolver(djfAnomXr)
     djfPcXr=solver.pcs(npcs=2, pcscaling=1)
@@ -117,13 +128,13 @@ def ecIndex(sstAnomXr):
     pFitDjf = poly.Polynomial.fit(djfPcXr.sel(mode=0), djfPcXr.sel(mode=1), 2)
     alphaDjf = pFitDjf.convert().coef[2]
     
-    cXr=(pcTimeXr.sel(mode=0)+pcTimeXr.sel(mode=1))/numpy.sqrt(2)
-    eXr=(pcTimeXr.sel(mode=0)-pcTimeXr.sel(mode=1))/numpy.sqrt(2)
+    #cXr=(pcTimeXr.sel(mode=0)+pcTimeXr.sel(mode=1))/numpy.sqrt(2)
+    #eXr=(pcTimeXr.sel(mode=0)-pcTimeXr.sel(mode=1))/numpy.sqrt(2)
         
     indeces = xarray.merge([pcTimeXr.sel(mode=0).drop('mode').rename('pc1'),
                             pcTimeXr.sel(mode=1).drop('mode').rename('pc2'), 
-                            eXr.rename('eIndex'),
-                            cXr.rename('cIndex')])
+                            #eXr.rename('eIndex'),cXr.rename('cIndex')
+                           ])
     indeces['alpha']=alpha
     indeces['alphaDjf']=alphaDjf
     

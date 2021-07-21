@@ -172,17 +172,23 @@ def loadModelData(model, variable, test,*args, **kargs):
                 grid = (subprocess.run(['ls',path], capture_output=True).stdout).decode("utf-8").split('\n')[0]
             path = path + grid + '/'   
             ls = (subprocess.run(['ls',path],capture_output=True).stdout)
-            dateFolder=ls.decode("utf-8").split('\n')[0]
+            dateFolder=ls.decode("utf-8").split('\n')[-2]
             path = path + dateFolder
         find=(subprocess.run(['find',path,'-regex','.*\\'+filterTerm],
                              capture_output=True).stdout)
         paths=find.decode("utf-8").split('\n')[:-1]
         #if nothing make a request file
-        #if len(paths)==0:
-            #print('Making request file')
-            #print(subprocess.run(['cd', '~;','clef','--request','cmip6','-m', model, '-e', test, '-vl', variant,'-t', variable.split('_')[1], '-v', variable.split('_')[0]], capture_output=True).stdout)
+        if len(paths)==0:
+            print('Making request file')
+            print(subprocess.run(['cd', '~;','clef','--request','cmip6','-m', model, '-e', test, '-vl', variant,'-t', variable.split('_')[1], '-v', variable.split('_')[0]], capture_output=True).stdout)
+        #remove a weird error
         if all([model=='NorESM2-MM',test=='piControl', variable=='tos_Omon']):
             paths.remove('/g/data/oi10/replicas/CMIP6/CMIP/NCC/NorESM2-MM/piControl/r1i1p1f1/Omon/tos/gn/v20191108/tos_Omon_NorESM2-MM_piControl_r1i1p1f1_gn_145001-145012.nc')
+        
+        #if nothing, look in my scratch incase I downloaded it
+        if len(paths)==0:
+            paths = getFilePaths(directory, filterTerm)
+        
     else:
         paths = getFilePaths(directory, filterTerm)
         #if nothing try online from esgf

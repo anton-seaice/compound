@@ -51,7 +51,7 @@ experimentSet=[*deckSet, *scenarioSet]
 # In[6]:
 
 
-modelSet=[_model.scenarioMip[35]]
+modelSet=[_model.scenarioMip[5,:]]
 
 
 # In[7]:
@@ -96,7 +96,6 @@ for iModel in modelSet:
     except Exception as e:
         print(iModel[1] + "Climatology did not calculate")
         print(e)
- 
 
 
 for iModel in modelSet:
@@ -208,6 +207,7 @@ for iModel in modelSet:
                     ], 'time')
 
                 indeces.assign_attrs(climatology='full length of pi Control')
+                indeces.to_netcdf('results/cmipMonthlyIndeces'+iModel[1]+'tos'+experiment+'.nc')
                 #print(indeces)
                 print('Caclulating warm season avs and Writing to disk')
                 

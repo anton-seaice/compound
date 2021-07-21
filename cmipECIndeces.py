@@ -17,21 +17,33 @@ import warnings
 warnings.filterwarnings('ignore')
 
 #the full model set
-modelSet=[_model.scenarioMip[35]]
+modelSet=_model.scenarioMip
 
 # For all the models, calculate the alphas and e/c Index
 
-for iModel in modelSet:
-    try:
+for iModel in modelSet[:,:]:
+    #try:
         print(iModel[1])
         
         climatXr=fh.loadModelData(iModel[1], 'tos_Omon', 'piControl', iModel[2]).tos
+        climatXr=climatXr.assign_attrs({'project_id':'CMIP'})
+                
+        tsXr=climatXr
+        
+        sstAnomXr=ec.sstAnoms(tsXr, climatXr)
+
+        indeces, pFit, eofsXr = ec.ecIndex(sstAnomXr)
+                
+        indeces.to_netcdf('results/ecIndex/indexPiControl'+str(iModel[1])+'.nc')
+        
         
         tsXr = xarray.concat([
             fh.loadModelData(iModel[1], 'tos_Omon', 'historical', iModel[3]).tos, 
             fh.loadModelData(iModel[1], 'tos_Omon', 'ssp585', iModel[3]).tos
         ], dim='time')
-       
+        tsXr=tsXr.assign_attrs({'project_id':'CMIP'})
+    
+    
         sstAnomXr=ec.sstAnoms(tsXr, climatXr)
 
         indeces, pFit, eofsXr = ec.ecIndex(sstAnomXr)
@@ -39,6 +51,6 @@ for iModel in modelSet:
         indeces.to_netcdf('results/ecIndex/index'+str(iModel[1])+'.nc')
         eofsXr.to_netcdf('results/ecIndex/eof'+str(iModel[1])+'.nc')
         
-    except Exception as e:
-        print(e)
+    #except Exception as e:
+    #    print(e)
 

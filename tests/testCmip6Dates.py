@@ -63,7 +63,7 @@ for i in range(0,len(modelSet)):
         try:
             #calculated indeces
             indecesDs = xarray.open_dataset(
-                '../results/cmipWarmSeasonIndeces/' + iModel[1] +'_'+ experiment + '.nc')
+                '../results/cmipWarmSeasonIndeces/' + iModel[1] +'tos'+ experiment + '.nc')
 
             calc=[indecesDs.year.values[0], #start year
                 indecesDs.year.values[-1]+1] #end year
@@ -93,6 +93,7 @@ for i in range(0,len(modelSet)):
                     #compare start year and end year for this variable to the indeces calculated
                     if not(numpy.array_equal(source,calc)):
                         print('noMatch' + experiment + variable)
+                        print('calculated ... sourceFile')
                         print([*calc, *source])
            
                 except Exception as e:
