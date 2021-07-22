@@ -172,8 +172,11 @@ def loadModelData(model, variable, test,*args, **kargs):
                 grid = (subprocess.run(['ls',path], capture_output=True).stdout).decode("utf-8").split('\n')[0]
             path = path + grid + '/'   
             ls = (subprocess.run(['ls',path],capture_output=True).stdout)
-            dateFolder=ls.decode("utf-8").split('\n')[-2]
-            path = path + dateFolder
+            dateFolder=ls.decode("utf-8").split('\n')
+            try:
+                path = path + dateFolder[-2]
+            except:
+                print("Not found on Gadi")
         find=(subprocess.run(['find',path,'-regex','.*\\'+filterTerm],
                              capture_output=True).stdout)
         paths=find.decode("utf-8").split('\n')[:-1]

@@ -21,8 +21,8 @@ modelSet=_model.scenarioMip
 
 # For all the models, calculate the alphas and e/c Index
 
-for iModel in modelSet[:,:]:
-    #try:
+for iModel in [modelSet[15,:]]:
+    try:
         print(iModel[1])
         
         climatXr=fh.loadModelData(iModel[1], 'tos_Omon', 'piControl', iModel[2]).tos
@@ -48,9 +48,8 @@ for iModel in modelSet[:,:]:
 
         indeces, pFit, eofsXr = ec.ecIndex(sstAnomXr)
                 
-        indeces.to_netcdf('results/ecIndex/index'+str(iModel[1])+'.nc')
-        eofsXr.to_netcdf('results/ecIndex/eof'+str(iModel[1])+'.nc')
+        indeces.to_netcdf('results/cmipEcIndex/index'+str(iModel[1])+'.nc')
+        eofsXr.to_netcdf('results/cmipEcIndex/eof'+str(iModel[1])+'.nc')
         
-    #except Exception as e:
-    #    print(e)
-
+    except Exception as e:
+        print(e)

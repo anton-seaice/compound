@@ -28,8 +28,8 @@ def applyCriteria(indexDa, critDa):
     
     #events are greater than or less than the criteria
     #doing a comparison with a Nan retruns false, when its easier if its still a Nan, so put the where in to look for nans
-    posEvents=(indexDa>critDa).where(indexDa.isnull()!=True)
-    negEvents=(indexDa<-1*critDa).where(indexDa.isnull()!=True)
+    posEvents=(indexDa>critDa).where(indexDa.isnull()!=True, drop=True)
+    negEvents=(indexDa<-1*critDa).where(indexDa.isnull()!=True, drop=True)
     
     # a positive impact is a positive event with a positive impact, or a negative event with a negative impact
     firePosDa=xarray.merge(

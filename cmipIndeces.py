@@ -51,7 +51,7 @@ experimentSet=[*deckSet, *scenarioSet]
 # In[6]:
 
 
-modelSet=[_model.scenarioMip[5,:]]
+modelSet=_model.scenarioMip[[22,23,4,13,30],:]
 
 
 # In[7]:
@@ -207,7 +207,7 @@ for iModel in modelSet:
                     ], 'time')
 
                 indeces.assign_attrs(climatology='full length of pi Control')
-                indeces.to_netcdf('results/cmipMonthlyIndeces'+iModel[1]+'tos'+experiment+'.nc')
+                indeces.to_netcdf('results/cmipMonthlyIndeces/'+iModel[1]+'tos'+experiment+'.nc')
                 #print(indeces)
                 print('Caclulating warm season avs and Writing to disk')
                 
