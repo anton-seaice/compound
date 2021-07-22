@@ -1,16 +1,16 @@
 import numpy
 
 #cesm here referes to CESM LME
-
 cesmFullForcings = ['001','002','003','004','005','006','007','008','009','010','011','012','013']
-
 cesmCntl = '0850cntl.001'
-
 cesmRcp85 = ['LME.002', 'LME.003', 'LME.008', 'LME.009']
-
 cesmAll = [*cesmRcp85, cesmCntl, *cesmFullForcings]
-
 cesmNoRepeats = [*cesmRcp85, '001','004','005','006','007','010','011','012','013']
+
+
+
+
+
 
 #cmip6
 deckSet=['piControl']#,'historical']
@@ -19,6 +19,7 @@ experimentSet=[*deckSet, *scenarioSet]
 scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     ['CSIRO-ARCCSS', 'ACCESS-CM2', 'r1i1p1f1_gn', 'r1i1p1f1_gn'],
     ['CSIRO', 'ACCESS-ESM1-5', 'r1i1p1f1_gn', 'r1i1p1f1_gn'],
+    ['AWI', 'AWI-CM-1-1-MR', 'r1i1p1f1', 'r1i1p1f1'],
     ['BCC', 'BCC-CSM2-MR', 'r1i1p1f1', 'r1i1p1f1'],
     ['CAMS', 'CAMS-CSM1-0', 'r1i1p1f1', 'r1i1p1f1'],
     ['CAS', 'CAS-ESM2-0', 'r1i1p1f1', 'r1i1p1f1'],
@@ -71,16 +72,13 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     #['KIOST', 'KIOST-ESM', 'r1i1p1f1', 'r1i1p1f1'],
     
     #cutting this because its badly formatted
-    #['AWI', 'AWI-CM-1-1-MR', 'r1i1p1f1', 'r1i1p1f1'],
+    #,
     
     # no Tos (no ocean?)
     #['NIMS-KMA', 'KACE-1-0-G', 'r1i1p1f1', 'r2i1p1f1'],
+
     
 #cmip5
-
-
-
-
 past1000 = [
     #'bcc-csm1-1',
     #'CCSM4',
