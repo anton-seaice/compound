@@ -117,15 +117,3 @@ for i in range(0,len(modelSet)):
         
 
 
-# Those errors all look ok:
-# 
-# 3: BCC - the source file has both a latitude and lat, so it gives this warning but is ok.
-# 
-# 5: Not really sure why times are different between the two, but there you go.
-# 
-
-# In[ ]:
-
-
-
-

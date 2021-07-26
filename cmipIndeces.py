@@ -51,7 +51,7 @@ experimentSet=[*deckSet, *scenarioSet]
 # In[6]:
 
 
-modelSet=[_model.scenarioMip[2]]
+modelSet=_model.scenarioMip
 
 
 # In[7]:

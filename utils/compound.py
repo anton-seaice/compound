@@ -45,7 +45,7 @@ def applyCriteria(indexDa, critDa):
 
 
 
-def compound(fireDa):
+def compound(inputDa):
     """
     
     
@@ -54,65 +54,92 @@ def compound(fireDa):
     """
 
     #Which indices are we using?
-    indexNames=list(fireDa.variables)
+    indexNames=list(inputDa.variables)
 
     ensoIndex=(set(_index.enso).intersection(indexNames))
     iodIndex=(set(_index.iod).intersection(indexNames))
     samIndex=(set(_index.sam).intersection(indexNames))
 
-    indexNames=[*ensoIndex, *iodIndex, *samIndex]
+    #indexNames=[*ensoIndex, *iodIndex, *samIndex]
     
     #For now, limiting ourselves to one for each driver
-    if len(ensoIndex)!=1:
-        raise Error('number of enso indeces is not 1')
-    elif len(iodIndex)!=1:
-        raise Error('number of iod indeces is not 1')
-    elif len(samIndex)!=1:
-        raise Error('number of sam indeces is not 1')
+    if len(ensoIndex)==0:
+        raise EnvironmentError('no enso indeces found')
+    elif len(iodIndex)==0:
+        raise EnvironmentError('no iod indeces found')
+    elif len(samIndex)==0:
+        raise EnvironmentError('no sam indeces found')
+        
+    indexSets=dict()
+    #nest for loops are the besssttt
+    for iEnso in ensoIndex:
+        for iIod in iodIndex:
+            for iSam in samIndex:
+                indexSets[iEnso+iIod.capitalize()+iSam.capitalize()]=[iEnso,iIod,iSam]
+                
+               
+    allFireLs=list()
+            
+    for iSet in indexSets.keys():
 
-    #How many events were there in each year?
-    #convert to an Da, so we can sum over the variables
-    fireDs=fireDa[indexNames].to_array()
-    #number of events is the sum of the three variables, but only where none of them are Nan
-    fireDa['nEvents']=fireDs.sum(dim='variable').where(
-        fireDs.isnull().all(dim='variable')!=True
-    )
-     
-    #Which years are there all three
-    fireDa['all3']=(fireDa.nEvents==3).where(
-        fireDa.nEvents.isnull()!=True
-    )
-    
-    fireDa=fireDa.assign_attrs({**fireDa.attrs, 'all3':str(indexNames)})
+        print(iSet)
+        indexNames=indexSets[iSet]
+        fireDa=xarray.Dataset()
+        
+        #How many events were there in each year?
+        #convert to an Ds, so we can sum over the variables
+        fireDs=inputDa[indexNames].to_array()
+        #number of events is the sum of the three variables, but only where none of them are Nan
+        fireDa['nEvents']=fireDs.sum(dim='variable').where(
+            fireDs.isnull().all(dim='variable')!=True
+        )
 
-    #Something to iterate names of pairs into
-    pairs=list()
-    
-    #Match each index with those further along the index list
-    #(Nested for loops are probably bad juju)
-    for i1 in range(0,len(indexNames)):
-        for i2 in range(i1+1, len(indexNames)):
-            #Its a compound of those two, if they both occur, and excluding if its a compound of all three
-            fireDa[indexNames[i1]+'+'+indexNames[i2]]=(
-                fireDa[indexNames[i1]]*
-                fireDa[indexNames[i2]]*
-                (fireDa['all3']==False)
-            )
-            
-            pairs.append(indexNames[i1]+'+'+indexNames[i2])
-            
-    #drop compounds from individual indices
-    fireDa[indexNames]=xarray.where(fireDa.nEvents.isnull(), float('NaN'),
-                                    xarray.where(fireDa.nEvents==1, fireDa[indexNames], 0)
-                                   ) #horrorshow?
-    
-    fireDa['anyCompound']=xarray.where(fireDa.nEvents.isnull(), float('NaN'), (fireDa.nEvents>1).astype('int') )
-            
-    #Write the names of pairs into attributes for neatness
-    fireDa=fireDa.assign_attrs({**fireDa.attrs,'indeces':indexNames, 'pairs':pairs})
-            
-    return fireDa
+        #Which years are there all three
+        fireDa['all3']=(fireDa.nEvents==3).where(
+            fireDa.nEvents.isnull()!=True
+        )
+        
+        #Something to iterate names of pairs into
+        #pairs=list()
 
+        #Match each index with those further along the index list
+        #(Nested for loops are probably bad juju)
+        #for i1 in range(0,len(indexNames)):
+        #    for i2 in range(i1+1, len(indexNames)):
+        #        #Its a compound of those two, if they both occur, and excluding if its a compound of all three
+        #        fireDa[indexNames[i1]+'+'+indexNames[i2]]=(
+        #            fireDa[indexNames[i1]]*
+        #            fireDa[indexNames[i2]]*
+        #            (fireDa['all3']==False)
+        #        )
+        #        pairs.append(indexNames[i1]+'+'+indexNames[i2])
+
+        fireDa['enso+iod']=(inputDa[indexNames[0]]*inputDa[indexNames[1]]*(fireDa['all3']==False))
+        fireDa['enso+sam']=(inputDa[indexNames[0]]*inputDa[indexNames[2]]*(fireDa['all3']==False))
+        fireDa['iod+sam']=(inputDa[indexNames[1]]*inputDa[indexNames[2]]*(fireDa['all3']==False))
+        
+        pairs=['enso+iod','enso+sam','iod+sam']
+        
+        #drop compounds from individual indices
+        fireDa['enso']=xarray.where(fireDa.nEvents.isnull(), float('NaN'),
+                                        xarray.where(fireDa.nEvents==1, inputDa[indexNames[0]], 0)
+                                       ) 
+        fireDa['iod']=xarray.where(fireDa.nEvents.isnull(), float('NaN'),
+                                        xarray.where(fireDa.nEvents==1, inputDa[indexNames[1]], 0)
+                                       )
+        fireDa['sam']=xarray.where(fireDa.nEvents.isnull(), float('NaN'),
+                                        xarray.where(fireDa.nEvents==1, inputDa[indexNames[2]], 0)
+                                       )#horrorshow?
+
+        fireDa['anyCompound']=xarray.where(fireDa.nEvents.isnull(), float('NaN'), (fireDa.nEvents>1).astype('int') )
+        
+        allFireLs.append(fireDa.to_array(dim='compound', name=iSet))
+            
+            
+    outputXr = xarray.merge(allFireLs)
+    outputXr=outputXr.assign_attrs({'indeces':indexNames, 'pairs':pairs, 'others':['all3','anyCompound','nEvents']})
+    
+    return outputXr
 
 
 

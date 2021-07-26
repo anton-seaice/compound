@@ -2,8 +2,8 @@
 # This dict is a container for the areas to calculate SST anomalies for when calculting SST indeces
 
 sstIndex = {
-    #"nino12" : {"latMin":-10, "latMax":0, "longMin":270,"longMax":280} ,
-    #"nino3" : {"latMin":-5, "latMax":5, "longMin":210,"longMax":270},
+    "nino12" : {"latMin":-10, "latMax":0, "longMin":270,"longMax":280} ,
+    "nino3" : {"latMin":-5, "latMax":5, "longMin":210,"longMax":270},
     "nino34" : {"latMin":-5, "latMax":5, "longMin":190,"longMax":240},
     "nino4" : {"latMin":-5, "latMax":5, "longMin":160,"longMax":210},
     "westIO" : {"latMin":-10, "latMax":10, "longMin":50,"longMax":70},
@@ -50,7 +50,7 @@ firePos = ['nino34', 'nino4', 'dmi', 'nino34NoDetrend', 'nino4NoDetrend', 'eInde
 fireNeg = ['sam', 'eastIO']
 
 # List of indices we could use for ENSO
-enso = ['nino3', 'nino34', 'nino4', 'nino3NoDetrend', 'nino34NoDetrend', 'nino4NoDetrend', 'ec', 'eIndex', 'cIndex']
+enso = ['nino3', 'nino34', 'nino4', 'nino3NoDetrend', 'nino34NoDetrend', 'nino4NoDetrend', 'ecCombined', 'eIndex', 'cIndex']
 
 # Indices we might use for IOD
 iod = ['dmi', 'eastIO', 'eastIONoDetrend']
