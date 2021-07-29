@@ -17,12 +17,12 @@ import warnings
 warnings.filterwarnings('ignore')
 
 #the full model set
-modelSet=_model.scenarioMip[[2,16],:]
+modelSet=_model.scenarioMip#[[2,16],:]
 
 # For all the models, calculate the alphas and e/c Index
 
 for iModel in modelSet:
-    #try:
+    try:
         print(iModel[1])
         
         climatXr=fh.loadModelData(iModel[1], 'tos_Omon', 'piControl', iModel[2]).tos
@@ -51,5 +51,5 @@ for iModel in modelSet:
         indeces.to_netcdf('results/cmipEcIndex/index'+str(iModel[1])+'.nc')
         eofsXr.to_netcdf('results/cmipEcIndex/eof'+str(iModel[1])+'.nc')
         
-    #except Exception as e:
-    #    print(e)
+    except Exception as e:
+        print(e)

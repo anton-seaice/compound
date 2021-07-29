@@ -44,7 +44,8 @@ warnings.filterwarnings('ignore')
 
 
 deckSet=['piControl','historical']
-scenarioSet=['ssp126', 'ssp245', 'ssp370','ssp585']
+scenarioSet=[#'ssp126', 'ssp245', 'ssp370',
+             'ssp585']
 experimentSet=[*deckSet, *scenarioSet]
 
 
@@ -72,7 +73,7 @@ len(modelSet)
 # In[ ]:
 
 
-for iModel in modelSet:
+'''for iModel in modelSet:
     
     print(iModel)
     
@@ -170,7 +171,7 @@ for iModel in modelSet:
 
 # In[ ]:
 
-
+'''
 for iModel in modelSet:
     
     print(iModel)

@@ -171,6 +171,7 @@ def loadModelData(model, variable, test,*args, **kargs):
             if grid=='.*?':
                 grid = (subprocess.run(['ls',path], capture_output=True).stdout).decode("utf-8").split('\n')[0]
             path = path + grid + '/'   
+            
             ls = (subprocess.run(['ls',path],capture_output=True).stdout)
             dateFolder=ls.decode("utf-8").split('\n')
             try:

@@ -24,6 +24,7 @@ xarray 0.18.0
 numpy 1.17.0
 cartopy 0.18.0
 eofs-1.4.0
+xesmf
 
 To Run:
 
