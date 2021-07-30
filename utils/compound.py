@@ -137,7 +137,7 @@ def compound(inputDa):
             
             
     outputXr = xarray.merge(allFireLs)
-    outputXr=outputXr.assign_attrs({'indeces':indexNames, 'pairs':pairs, 'others':['all3','anyCompound','nEvents']})
+    outputXr=outputXr.assign_attrs({'indeces':['enso','iod','sam'], 'pairs':pairs, 'others':['all3','anyCompound','nEvents']})
     
     return outputXr
 

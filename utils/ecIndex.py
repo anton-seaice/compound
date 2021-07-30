@@ -53,10 +53,10 @@ def sstAnoms(tsXr, climatXr):
     ''' sst Anoms using two datasets provided'''
     
     #calculate average between -20 and 20 globall to detrend with
-    trendXr=sst.calculateIndex(
-                tsXr.to_dataset().assign_attrs({'project_id':'CMIP'}), 
-                sst.calculateClimatology(climatXr.to_dataset().assign_attrs({'project_id':'CMIP'}))
-                                ).backgroundSstNoDetrend.chunk('auto')
+    #trendXr=sst.calculateIndex(
+    #            tsXr.to_dataset().assign_attrs({'project_id':'CMIP'}), 
+    #            sst.calculateClimatology(climatXr.to_dataset().assign_attrs({'project_id':'CMIP'}))
+     #                           ).backgroundSstNoDetrend.chunk('auto')
     
     #Area of interest for ec Indeces
     tsXr=tsXr.where(
@@ -71,6 +71,8 @@ def sstAnoms(tsXr, climatXr):
         drop=True
     )
     
+    
+    
     climatXr=climatXr.chunk([-1, 'auto', 'auto'])
     
     climatMeans=climatXr.groupby('time.month').mean(dim='time')
@@ -82,8 +84,8 @@ def sstAnoms(tsXr, climatXr):
     sstAnomXr=sstAnomXr.chunk([-1, 'auto', 'auto'])
     
     #Fit a quadratic and detrend using it
-    #trendXr = sstAnomXr.polyfit('time', 2)
-    #trendXr = xarray.polyval(sstAnomXr.time, trendXr.polyfit_coefficients, 'degree')
+    trendXr = sstAnomXr.polyfit('time', 2)
+    trendXr = xarray.polyval(sstAnomXr.time, trendXr.polyfit_coefficients, 'degree')
     
     
     detrendXr=sstAnomXr-trendXr
@@ -114,7 +116,7 @@ def ecIndex(sstAnomXr):
             sstAnomXr.to_dataset(name='enso')).rename({'year':'time'}).enso.chunk('auto')
 
     solver=eofSolver(djfAnomXr)
-    djfPcXr=solver.pcs(npcs=2, pcscaling=1)
+    djfPcXr=solver.pcs(npcs=2) #, pcscaling=1)
     
     
     pc1 = pcTimeXr.sel(mode=0)
@@ -123,7 +125,7 @@ def ecIndex(sstAnomXr):
     pFit = poly.Polynomial.fit(pc1, pc2, 2)
     alpha = pFit.convert().coef[2]
     
-    eofsXr = solver.eofs(neofs=2) #eofscaling=1
+    eofsXr = solver.eofsAsCorrelation(neofs=2) #eofscaling=1
     
     pFitDjf = poly.Polynomial.fit(djfPcXr.sel(mode=0), djfPcXr.sel(mode=1), 2)
     alphaDjf = pFitDjf.convert().coef[2]
