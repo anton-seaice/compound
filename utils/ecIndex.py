@@ -109,19 +109,7 @@ def pcs(solver):
     import numpy.polynomial as poly
     
     
-<<<<<<< HEAD
     pcTimeXr=solver.pcs(npcs=2)
-=======
-    solver=eofSolver(sstAnomXr)
-    pcTimeXr=solver.pcs(npcs=2, pcscaling=1)
-    
-    djfAnomXr=tp.averageForTimePeriod(
-            sstAnomXr.to_dataset(name='enso')).rename({'year':'time'}).enso.chunk('auto')
-
-    solver=eofSolver(djfAnomXr)
-    djfPcXr=solver.pcs(npcs=2) #, pcscaling=1)
-    
->>>>>>> 18c1a4dd864391be7b88531b5a98b1b79bb8c906
     
     pc1 = pcTimeXr.sel(mode=0)
     pc2 = pcTimeXr.sel(mode=1)
