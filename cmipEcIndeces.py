@@ -22,34 +22,47 @@ modelSet=_model.scenarioMip#[[2,16],:]
 # For all the models, calculate the alphas and e/c Index
 
 for iModel in modelSet:
-    try:
+    #try:
         print(iModel[1])
         
+        #Load the ssts from piControl
         climatXr=fh.loadModelData(iModel[1], 'tos_Omon', 'piControl', iModel[2]).tos
         climatXr=climatXr.assign_attrs({'project_id':'CMIP'})
                 
         tsXr=climatXr
         
+        #Calculate anomalies using piControl baseline
         sstAnomXr=ec.sstAnoms(tsXr, climatXr)
-
-        indeces, pFit, eofsXr = ec.ecIndex(sstAnomXr)
+        
+        #create the solver
+        solver=ec.eofSolver(sstAnomXr)
+        
+        #caluculate pcs and eofs
+        indeces, pFit, eofsXr = ec.pcs(solver)
                 
-        indeces.to_netcdf('results/cmipEcIndex/indexPiControl'+str(iModel[1])+'.nc')
+        eofsXr.to_netcdf('results/cmipEcIndex/eof'+str(iModel[1])+'.nc')
+        indeces.to_netcdf('results/cmipEcIndex/pcPiControl'+str(iModel[1])+'.nc')
         
-        
+        #load the ssts from ssp585
         tsXr = xarray.concat([
             fh.loadModelData(iModel[1], 'tos_Omon', 'historical', iModel[3]).tos, 
             fh.loadModelData(iModel[1], 'tos_Omon', 'ssp585', iModel[3]).tos
         ], dim='time')
         tsXr=tsXr.assign_attrs({'project_id':'CMIP'})
-    
-    
+            
+        #Calculate anomalies using piControl baseline
         sstAnomXr=ec.sstAnoms(tsXr, climatXr)
 
-        indeces, pFit, eofsXr = ec.ecIndex(sstAnomXr)
-                
-        indeces.to_netcdf('results/cmipEcIndex/index'+str(iModel[1])+'.nc')
-        eofsXr.to_netcdf('results/cmipEcIndex/eof'+str(iModel[1])+'.nc')
+        #project these anomalies onto the Eofs from piControl
+        expPcs=solver.projectField(sstAnomXr)
         
-    except Exception as e:
-        print(e)
+        #reformat for consistency
+        indeces = xarray.merge([expPcs.sel(mode=0, drop=True).rename('pc1'),
+                            expPcs.sel(mode=1, drop=True).rename('pc2'), 
+                           ])
+        
+        indeces.to_netcdf('results/cmipEcIndex/pcSsp585'+str(iModel[1])+'.nc')
+        
+        
+    #except Exception as e:
+    #    print(e)

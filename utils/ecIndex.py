@@ -105,10 +105,13 @@ def eofSolver(sstAnomXr):
     return Eof(sstAnomXr) #, weights=weights)
 
 
-def ecIndex(sstAnomXr):
+def pcs(solver):
     import numpy.polynomial as poly
     
     
+<<<<<<< HEAD
+    pcTimeXr=solver.pcs(npcs=2)
+=======
     solver=eofSolver(sstAnomXr)
     pcTimeXr=solver.pcs(npcs=2, pcscaling=1)
     
@@ -118,6 +121,7 @@ def ecIndex(sstAnomXr):
     solver=eofSolver(djfAnomXr)
     djfPcXr=solver.pcs(npcs=2) #, pcscaling=1)
     
+>>>>>>> 18c1a4dd864391be7b88531b5a98b1b79bb8c906
     
     pc1 = pcTimeXr.sel(mode=0)
     pc2 = pcTimeXr.sel(mode=1)
@@ -127,21 +131,12 @@ def ecIndex(sstAnomXr):
     
     eofsXr = solver.eofsAsCorrelation(neofs=2) #eofscaling=1
     
-    pFitDjf = poly.Polynomial.fit(djfPcXr.sel(mode=0), djfPcXr.sel(mode=1), 2)
-    alphaDjf = pFitDjf.convert().coef[2]
-    
-    #cXr=(pcTimeXr.sel(mode=0)+pcTimeXr.sel(mode=1))/numpy.sqrt(2)
-    #eXr=(pcTimeXr.sel(mode=0)-pcTimeXr.sel(mode=1))/numpy.sqrt(2)
-        
-    indeces = xarray.merge([pcTimeXr.sel(mode=0).drop('mode').rename('pc1'),
-                            pcTimeXr.sel(mode=1).drop('mode').rename('pc2'), 
-                            #eXr.rename('eIndex'),cXr.rename('cIndex')
+    indeces = xarray.merge([pcTimeXr.sel(mode=0, drop=True).rename('pc1'),
+                            pcTimeXr.sel(mode=1, drop=True).rename('pc2'), 
                            ])
     indeces['alpha']=alpha
-    indeces['alphaDjf']=alphaDjf
     
     return indeces, pFit, eofsXr
-
 
 
 
