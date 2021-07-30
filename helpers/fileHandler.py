@@ -162,12 +162,22 @@ def loadModelData(model, variable, test,*args, **kargs):
         directory = constructDirectoryPath(test, 'MON', variable)
 
 #Second get an list of paths for that filer term and directory  
-
     if node().split('-')[0]=='gadi':
-        if model.split('-')[0]=='ACCESS':
-            path='/g/data/fs38/publications/'+directory+institutionFinder(model)+'/'+model+'/'+test+'/'+variant+'/'+variable.split('_')[1]+'/'+variable.split('_')[0]+'/'+grid+'/latest/'
+        
+        #Figure out the instituion for this model
+        if all([model=='MPI-ESM1-2-HR',
+                any([test=='ssp126', test=='ssp245', test=='ssp370', test=='ssp585'])]):
+            #this is a special case where the institutuion is different for some experiments!
+            instit='DKRZ'
         else:
-            path='/g/data/oi10/replicas/'+directory+institutionFinder(model)+'/'+model+'/'+test+'/'+variant+'/'+variable.split('_')[1]+'/'+variable.split('_')[0]+'/'
+            instit=institutionFinder(model)
+        
+        # local published data is stored different to replicated data
+        if model.split('-')[0]=='ACCESS':
+            path='/g/data/fs38/publications/'+directory+instit+'/'+model+'/'+test+'/'+variant+'/'+variable.split('_')[1]+'/'+variable.split('_')[0]+'/'+grid+'/latest/'
+        
+        else:
+            path='/g/data/oi10/replicas/'+directory+instit+'/'+model+'/'+test+'/'+variant+'/'+variable.split('_')[1]+'/'+variable.split('_')[0]+'/'
             if grid=='.*?':
                 grid = (subprocess.run(['ls',path], capture_output=True).stdout).decode("utf-8").split('\n')[0]
             path = path + grid + '/'   
@@ -178,6 +188,8 @@ def loadModelData(model, variable, test,*args, **kargs):
                 path = path + dateFolder[-2]
             except:
                 print("Not found on Gadi")
+                print(path)
+                print(dateFolder)
         find=(subprocess.run(['find',path,'-regex','.*\\'+filterTerm],
                              capture_output=True).stdout)
         paths=find.decode("utf-8").split('\n')[:-1]
@@ -185,9 +197,11 @@ def loadModelData(model, variable, test,*args, **kargs):
         if len(paths)==0:
             print('Making request file')
             print(subprocess.run(['cd', '~;','clef','--request','cmip6','-m', model, '-e', test, '-vl', variant,'-t', variable.split('_')[1], '-v', variable.split('_')[0]], capture_output=True).stdout)
-        #remove a weird error
+        #remove weird errors
         if all([model=='NorESM2-MM',test=='piControl', variable=='tos_Omon']):
             paths.remove('/g/data/oi10/replicas/CMIP6/CMIP/NCC/NorESM2-MM/piControl/r1i1p1f1/Omon/tos/gn/v20191108/tos_Omon_NorESM2-MM_piControl_r1i1p1f1_gn_145001-145012.nc')
+        if all([model=='NorESM2-LM',test=='ssp585', variable=='pr_Amon']):
+            paths.remove('/g/data/oi10/replicas/CMIP6/ScenarioMIP/NCC/NorESM2-LM/ssp585/r1i1p1f1/Amon/pr/gn/v20191108/pr_Amon_NorESM2-LM_ssp585_r1i1p1f1_gn_204001-205012.nc')
         
         #if nothing, look in my scratch incase I downloaded it
         if len(paths)==0:

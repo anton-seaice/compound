@@ -136,3 +136,27 @@ historical = [
     'NorESM1-M',
     'NorESM1-ME'
 ]
+
+wangsAnswers={'CAMS-CSM1-0':-0.2902, 
+    'CMCC-CM2-SR5':-0.4055, 
+    'CNRM-CM6-1':-0.1662, 
+    'CNRM-ESM2-1':-0.1687,
+    'EC-Earth3':-0.2662, 
+    'EC-Earth3-Veg':-0.2665, 
+    'FIO-ESM-2-0':-0.3751,
+    'MIROC6':-0.3198, 
+    'MIROC-ES2L': -0.3466,
+    'HadGEM3-GC31-LL':-0.1785, 
+    'MPI-ESM1-2-HR':-0.2660, 
+    'MPI-ESM1-2-LR':-0.2338, 
+    'MRI-ESM2-0':-0.3387,
+    'GISS-E2-1-G':-0.3644, 
+    'CESM2':-0.3216, 
+    'CESM2-WACCM':-0.2436, 
+    'NorESM2-LM':-0.2505, 
+    'NorESM2-MM':-.2077,
+    'GFDL-ESM4':-.1931, 
+    'CIESM':-.1886, 
+    'MCM-UA-1-0':-0.2888}
+
+wangModelSet = list(wangsAnswers.keys())
