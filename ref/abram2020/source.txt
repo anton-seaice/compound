@@ -1,0 +1,3 @@
+https://www.ncei.noaa.gov/pub/data/paleo/coral/indian_ocean/abram2020/abram2020-iod-event.txt
+
+downloaded 3 August 2021
