@@ -1,4 +1,5 @@
 import re #regex
+from platform import node
 
 #python number and array handling
 import cftime
@@ -13,8 +14,6 @@ import helpers.cvdpTime as cvdpTime
 import utils._modelDefinitions as _model
 import helpers.esgfClient as esgfClient
 from helpers.basePath import basePath
-
-from platform import node
 
 
 def institutionFinder(model) :
@@ -185,6 +184,7 @@ def loadModelData(model, variable, test,*args, **kargs):
             ls = (subprocess.run(['ls',path],capture_output=True).stdout)
             dateFolder=ls.decode("utf-8").split('\n')
             try:
+                #print(model+test+variant+variable+dateFolder[-2])
                 path = path + dateFolder[-2]
             except:
                 print("Not found on Gadi")
@@ -259,8 +259,3 @@ def loadModelData(model, variable, test,*args, **kargs):
     result['lon']=((result.lon + 360) % 360)
     
     return result
-
-
-
-
-    
