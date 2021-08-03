@@ -24,3 +24,5 @@ To-Do:
 
 - calculating indeces against dummy data
 - automating results and then making a script to run all tests?
+
+In addition to CMIP6/CESM-LME data used for main analysis, this also accesses CVDP outputs (for validation purposes only).

@@ -1,6 +1,6 @@
 # compound
 
-This is a collection of scripts to examine changing frequenices of compounding impacts from multiple climate drivers upon mainland South East Australia.
+This is a collection of scripts to examine changing frequenices of compounding impacts from multiple climate drivers upon mainland south east Australia.
 
 Developed using python 3.7
 
@@ -28,12 +28,14 @@ xesmf
 
 To Run:
 
-output from cesmIndeces is needed for everything else
+output from cesmIndeces is needed for all other cesm analysis
 output from cesmPrecTsMonthly is needed for cesmCompoundsImpact
+
+similarly, output from cmipIndeces and cmipPrTs is needed for the other workbooks.
 
 Descriptions:
 
-1. cesmIndeces
+1. cesmIndeces/cmipIndeces
 - Calculates monthly indeces (for indeces included in utils/_indexDefinitions.py)
 - Calculates warm season averages (time periods defined in utils/_indexDefinitions.py)
 
@@ -53,8 +55,8 @@ Descriptions:
 
 Source data:
 - CESM-LME ensemble outputs
-- CMIP5 past1000/historical/rcp outputs
-- CVDP outputs (for validation purposes only)
+- CMIP6 piControl/historical/ssp outputs
+
 
 Useful git commands:
 
