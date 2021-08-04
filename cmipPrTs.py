@@ -30,15 +30,15 @@ regridXr=xarray.Dataset({'lat': (['lat'], numpy.arange(-50, 0, 1.5)),
                    )
 
 
-for model in _model.scenarioMip[[31],:]:
+for model in _model.scenarioMip:
     #Calculate a climatology
     #Based on the control run, calculate monthly anomalies
     
-    #try:
+    try:
         print(model)
         xr = xarray.merge([
             fh.loadModelData(model[1], 'pr_Amon', 'piControl', model[2]).pr*secondsToTimeP,
-            fh.loadModelData(model[1], 'tas_Amon', 'piControl', model[2]).tas
+            fh.loadModelData(model[1], 'tasmax_Amon', 'piControl', model[2]).tasmax
         ], compat='override')
 
         domainXr=xr.where(
@@ -68,26 +68,31 @@ for model in _model.scenarioMip[[31],:]:
             'results/cmipWarmSeasonPrTs/'+model[1]+'PiControl.nc')
     
     
-    #except Exception as e:
-     #       print(e)
+    except Exception as e:
+        print(e)
     
     #calculate anomalies for all scenarios
-        for experiment in ['ssp585']:
+        for experiment in ['ssp126','ssp245','ssp585']:
 
-            #try: 
+            try: 
                 #load it
                 monMeansDa=xarray.open_dataset(
                 'results/cmipMonthlyPrTs/monMeans'+model[1]+'.nc')
 
-                xr = xarray.merge([
-                    xarray.concat([
-                        fh.loadModelData(model[1], 'pr_Amon', 'historical', model[3]), 
-                        fh.loadModelData(model[1], 'pr_Amon', experiment, model[3])],
+                xr = xarray.merge(
+                    [
+                        xarray.concat(
+                            [
+                                fh.loadModelData(model[1], 'pr_Amon', 'historical', model[3]), 
+                                fh.loadModelData(model[1], 'pr_Amon', experiment, model[3])
+                            ],
                         'time').pr*secondsToTimeP,
-                    xarray.concat([
-                        fh.loadModelData(model[1], 'tas_Amon', 'historical', model[3]),
-                        fh.loadModelData(model[1], 'tas_Amon', experiment, model[3])],
-                        'time').tas
+                        xarray.concat(
+                            [
+                                fh.loadModelData(model[1], 'tasmax_Amon', 'historical', model[3]),
+                                fh.loadModelData(model[1], 'tasmax_Amon', experiment, model[3])
+                            ],
+                        'time').tasmax
                 ], compat='override')
 
                         #grab area around Australia
@@ -110,8 +115,8 @@ for model in _model.scenarioMip[[31],:]:
                 warmSeasonAnomDa.to_netcdf(
                     'results/cmipWarmSeasonPrTs/'+model[1]+experiment+'.nc')
 
-            #except Exception as e:
-            #    print(model[1] + experiment + " did not calculate")
-            #    print(e)
+            except Exception as e:
+                print(model[1] + experiment + " did not calculate")
+                print(e)
 
 
