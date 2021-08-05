@@ -50,7 +50,7 @@ nDaysOfInterest = {
 firePos = ['nino34', 'nino4', 'dmi', 'nino34NoDetrend', 'nino4NoDetrend', 'eIndex','cIndex','NCT', 'NWP']
 
 # This is indices which are fire promiting when negative in the warm-seaonon
-fireNeg = ['sam', 'eastIO']
+fireNeg = ['sam', 'eastIO','samMarshall', 'samFogt']
 
 # List of indices we could use for ENSO
 enso = ['nino3', 'nino34', 'nino4', 'nino3NoDetrend', 'nino34NoDetrend', 'nino4NoDetrend', 'ecCombined', 'eIndex', 'cIndex', 'NCT', 'NWP']
@@ -59,4 +59,4 @@ enso = ['nino3', 'nino34', 'nino4', 'nino3NoDetrend', 'nino34NoDetrend', 'nino4N
 iod = ['dmi', 'eastIO', 'eastIONoDetrend']
 
 # Indices we might use for SAM
-sam = ['sam']
+sam = ['sam', 'samMarshall', 'samFogt']
