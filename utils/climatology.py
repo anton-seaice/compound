@@ -15,7 +15,7 @@ def dateInterval(x, climatStart, climatFinish):
             cftime.DatetimeNoLeap(climatStart,1,1),
             cftime.DatetimeNoLeap(climatFinish+1,1,1)
         )
-        )     
+    )     
     return xClimatology
 
 def normalise(x, xClimatology):

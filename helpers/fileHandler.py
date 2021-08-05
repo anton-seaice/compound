@@ -228,9 +228,11 @@ def loadModelData(model, variable, test,*args, **kargs):
             result = xarray.open_mfdataset(paths, **kargs)
             result['time'] = result['time']-pandas.to_timedelta(1, unit='d')
     else:
-        # other model types.
+        # CMIP6.
         result = xarray.open_mfdataset(paths, use_cftime=True, **kargs)
 
+        # make some dumb corrections
+        
         #If there is a time coord, then make it monthly using 365 cal
         timeRe=re.compile('time')
         cfTimeRe=re.compile('cftime._cftime.DatetimeNoLeap')
@@ -239,23 +241,22 @@ def loadModelData(model, variable, test,*args, **kargs):
                 #if not(cfTimeRe.search(str(type(result.time.values[0])))):
                     result = to_365day_monthly(result)
                     
-    #Fourth - make some dumb corrections
-    #most model use 'lon' and 'lat', so use these if they have used 'longitude' and 'latitude'
-    latRe=re.compile('latitude')
-    matches = [latRe.search(string) for string in list(result.coords)]
-    for m in matches:
-        if m!=None:
-             if m.span()==(0,8): #this is a weid way of matching?
-                    try:
-                        result=result.rename({'latitude':'lat', 
-                                'longitude':'lon'})
-                    except:
-                        print('Warning: could not replace latitude with lat')
-    
-    if all([model=='IPSL-CM6A-LR',variable.split('_')[0]=='tos']): 
-        result=result.rename({'nav_lat':'lat', 'nav_lon':'lon'})
-    
-    #standardise all models to use 0 to 360E (instead of -180 to 180)                
-    result['lon']=((result.lon + 360) % 360)
+        #most model use 'lon' and 'lat', so use these if they have used 'longitude' and 'latitude'
+        latRe=re.compile('latitude')
+        matches = [latRe.search(string) for string in list(result.coords)]
+        for m in matches:
+            if m!=None:
+                 if m.span()==(0,8): #this is a weid way of matching?
+                        try:
+                            result=result.rename({'latitude':'lat', 
+                                    'longitude':'lon'})
+                        except:
+                            print('Warning: could not replace latitude with lat')
+
+        if all([model=='IPSL-CM6A-LR',variable.split('_')[0]=='tos']): 
+            result=result.rename({'nav_lat':'lat', 'nav_lon':'lon'})
+
+        #standardise all models to use 0 to 360E (instead of -180 to 180)                
+        result['lon']=((result.lon + 360) % 360)
     
     return result

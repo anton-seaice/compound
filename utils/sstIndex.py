@@ -41,14 +41,12 @@ def calculateClimatology(climatDs, *args):
     #Figure out what sort of data it is
     if (hasattr(climatDs, 'project_id')):
         if (climatDs.project_id=='CMIP'):
-            #print('Ds looks like CMIP')
-            #Rename it to look like CESM data
-            #climatDs=climatDs.rename_dims({'lat':'nlat', 'lon':'nlon'})
-            climatDs=climatDs.rename_vars({'tos':'SST',
-                                           #'areacella':'TAREA', 
-                                           #'lat':'TLAT', 'lon':'TLONG'
-                                          })
+            climatDs=climatDs.rename_vars({'tos':'SST'})
     else:
+        climatDs=climatDs.rename_vars({
+                            'TLAT':'lat', 
+                            'TLONG':'lon'
+                              })
         climatDs['SST']=climatDs.SST.isel(z_t=0)
    
     index = _index.sstIndex
@@ -113,6 +111,10 @@ def calculateIndex(ds, *args):
                               })
     else:
         print('Ds looks like CESM') #CESM-LME
+        ds=ds.rename_vars({
+                        'TLAT':'lat',
+                        'TLONG':'lon'
+                          })
         #There's only one depth dimension, so we will drop that
         ds['SST']=ds.SST.isel(z_t=0)
         if ds.TAREA.dims=='time':

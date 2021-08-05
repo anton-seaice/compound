@@ -32,7 +32,7 @@ def decodeTime(ds):
             start=cftime.DatetimeNoLeap(
                 int(start.split('-')[0]) ,
                 int(start.split('-')[1]) ,
-                int(start.split('-')[2]) , 
+                1 , 
             ) ,
             periods=nPeriods, 
             freq="M", calendar="noleap")

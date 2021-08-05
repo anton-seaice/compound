@@ -24,6 +24,7 @@ xarray 0.18.0
 numpy 1.17.0
 cartopy 0.18.0
 eofs-1.4.0
+nc-time-axis 1.3.1
 xesmf
 
 To Run:
