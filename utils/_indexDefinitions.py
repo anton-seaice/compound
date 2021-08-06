@@ -18,16 +18,13 @@ pslIndex = {
 
 # This is the months of interest for each index when calculating warm-season averages
 monthsOfInterest = {
-#    "nino12" :  [7,15] ,
-#    "nino3" :[7,15] ,
+    "nino3" :[7,15] ,
     "nino34NoDetrend" : [7,15] ,
     "nino4NoDetrend" : [7,15] ,
-    #"westIONoDetrend" : [7,12] ,
     "eastIONoDetrend" : [7,12] , 
     "dmi": [7,12] ,
     "nino34" : [7,15] ,
     "nino4" : [7,15] ,
-    #"westIO" : [7,12] ,
     "eastIO" : [7,12] , 
     "sam" : [10, 15] ,
     "lat1" : [10, 15],

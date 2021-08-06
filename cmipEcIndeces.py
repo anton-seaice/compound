@@ -4,20 +4,20 @@
 import sys
 sys.path.append(sys.path[0]+'/../')
 
+# handy python functions
+import xarray
+
 #import my functions
 import helpers.fileHandler as fh
 import utils._modelDefinitions as _model
 import utils.ecIndex as ec
-
-# handy python functions
-import xarray
 
 # turn off warnings:
 import warnings
 warnings.filterwarnings('ignore')
 
 #the full model set
-modelSet=_model.scenarioMip#[[2,16],:]
+modelSet=_model.scenarioMip[31:]
 
 # For all the models, calculate the alphas and e/c Index
 
