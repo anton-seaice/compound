@@ -38,7 +38,7 @@ for model in _model.scenarioMip:
         print(model)
         xr = xarray.merge([
             fh.loadModelData(model[1], 'pr_Amon', 'piControl', model[2]).pr*secondsToTimeP,
-            fh.loadModelData(model[1], 'tasmax_Amon', 'piControl', model[2]).tasmax
+            fh.loadModelData(model[1], 'tas_Amon', 'piControl', model[2]).tas
         ], compat='override')
 
         domainXr=xr.where(
@@ -89,10 +89,10 @@ for model in _model.scenarioMip:
                         'time').pr*secondsToTimeP,
                         xarray.concat(
                             [
-                                fh.loadModelData(model[1], 'tasmax_Amon', 'historical', model[3]),
-                                fh.loadModelData(model[1], 'tasmax_Amon', experiment, model[3])
+                                fh.loadModelData(model[1], 'tas_Amon', 'historical', model[3]),
+                                fh.loadModelData(model[1], 'tas_Amon', experiment, model[3])
                             ],
-                        'time').tasmax
+                        'time').tas
                 ], compat='override')
 
                         #grab area around Australia
