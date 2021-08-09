@@ -22,7 +22,7 @@ def sstDomain(ds, indexKey):
     domainDs=ds.where(
         (ds.lat>domain['latMin']) & (ds.lat<domain['latMax']) & (ds.lon>domain['longMin']) & (ds.lon<domain['longMax']),
         drop=True
-    ).SST
+    )#.SST
 
     return domainDs
 
@@ -39,7 +39,7 @@ def calculateClimatology(climatDs, *args):
     """
 
     #Figure out what sort of data it is
-    if (hasattr(climatDs, 'project_id')):
+    '''if (hasattr(climatDs, 'project_id')):
         if (climatDs.project_id=='CMIP'):
             climatDs=climatDs.rename_vars({'tos':'SST'})
     else:
@@ -47,7 +47,7 @@ def calculateClimatology(climatDs, *args):
                             'TLAT':'lat', 
                             'TLONG':'lon'
                               })
-        climatDs['SST']=climatDs.SST.isel(z_t=0)
+        climatDs['SST']=climatDs.SST.isel(z_t=0)'''
    
     index = _index.sstIndex
     
@@ -101,25 +101,26 @@ def calculateIndex(ds, *args):
         raise(EnvironmentError("Wrong input arguments provided"))
     
     #tidy up input data so the variable names are common between CMIP and CESM
-    if (hasattr(ds, 'project_id')):
-        if (ds.project_id=='CMIP'):
+    #if not(hasattr(ds, 'project_id')):
+        #if (ds.project_id=='CMIP'):
             #print('Ds looks like CMIP')
             #ds=ds.rename_dims({'lat':'nlat', 'lon':'nlon'})
-            ds=ds.rename_vars({'tos':'SST',
+            #ds=ds.rename_vars({'tos':'SST',
                                #'areacella':'TAREA',
                                #'lat':'TLAT', 'lon':'TLONG'
-                              })
-    else:
-        print('Ds looks like CESM') #CESM-LME
-        ds=ds.rename_vars({
-                        'TLAT':'lat',
-                        'TLONG':'lon'
-                          })
-        #There's only one depth dimension, so we will drop that
-        ds['SST']=ds.SST.isel(z_t=0)
-        if ds.TAREA.dims=='time':
+             #                 })
+    #else:
+    #    print('Ds looks like CESM') #CESM-LME
+    #    ds=ds.rename_vars({
+    #                    'TLAT':'lat',
+    #                    'TLONG':'lon'
+    #                      })
+    #    #There's only one depth dimension, so we will drop that
+        #ds['SST']=ds.SST.isel(z_t=0)
+    #    ds=ds.isel(z_t=0)
+    #    if ds.TAREA.dims=='time':
             #For some reason TAREA has a time dimension (possible from opening multiple files), but doesn't change in time, so well drop that too
-            ds['TAREA']=ds.TAREA.isel(time=0)
+     #       ds['TAREA']=ds.TAREA.isel(time=0)
     
     
     #Making TAREA a coordinate
