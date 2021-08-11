@@ -10,24 +10,33 @@ import utils.climatology as climat
 
 
 def sstDomain(ds, indexKey):
-    """From a provided dataset, return the area domain of sea surface temperatures for the index request """
+    """From a provided xarray, return the area domain of sea surface temperatures for the index requested 
+    
+    the xarray must have lon and lat coordinates
+    
+    the string indexKey must be defined in utils/_indexDefinitions.py as a sstIndex
+    
+    """
     
     #grab the area of interest for this index
-    domain=_index.sstIndex[indexKey]
-
-    #ADD RANGE CHECKING!
+    try:
+        domain=_index.sstIndex[indexKey]
+    except:
+        raise EnvironmentError(indexKey + " not defined in utils/_indexDefinitions.py file as a sst domain")
+        
+    #there is no range checking if the areas defined are non-sense. this would be complicated because there is no particular requirement on the range, as long as it is consistent with how it is defined in indexDefinitions. (i.e. if your file has -150E, but you definition uses 330E, it won't work properly but won't report an error)
     
     #Carve out the area of interest for this index
     #https://www.cesm.ucar.edu/models/ccsm3.0/csim/RefGuide/ice_refdoc/node9.html describes TLAT/TLONG. They are in the middle of a grid square in the model.
     domainDs=ds.where(
         (ds.lat>domain['latMin']) & (ds.lat<domain['latMax']) & (ds.lon>domain['longMin']) & (ds.lon<domain['longMax']),
         drop=True
-    )#.SST
+    )
 
     return domainDs
 
 def calculateClimatology(climatDs, *args): 
-    """From a provided dataset, start year and finish year, return the calculated mean for every SST index defined in _indexDefinitions file.
+    """From a provided sea surface temperature dataset, start year and finish year, return the calculated mean for every SST index defined in _indexDefinitions file.
     
     
     Useage
@@ -37,38 +46,28 @@ def calculateClimatology(climatDs, *args):
     calculateClimatology(climatDs, climatStart, climatFinish)
     
     """
-
-    #Figure out what sort of data it is
-    '''if (hasattr(climatDs, 'project_id')):
-        if (climatDs.project_id=='CMIP'):
-            climatDs=climatDs.rename_vars({'tos':'SST'})
-    else:
-        climatDs=climatDs.rename_vars({
-                            'TLAT':'lat', 
-                            'TLONG':'lon'
-                              })
-        climatDs['SST']=climatDs.SST.isel(z_t=0)'''
-   
+    #indeces to calculate
     index = _index.sstIndex
     
     #DataFrame to put monthly sst means in 
     sstMean = dict()
        
+    if len(args)==2:
+        #reduce domain by years provided
+        climatDs=climat.dateInterval(climatDs, args[0], args[1])
+    elif len(args)!=0:
+        raise(Error("Wrong number of inputs provided"))
+    #else do nothing, 0 arguments provided means length the full length of the dataset
+        
     #for every index name
     for key in index:
         
+        #get the relevant area
         domainDs=sstDomain(climatDs, key)
         
-        if len(args)==2:
-            #reduce domain by years provided
-            domainDs=climat.dateInterval(domainDs, args[0], args[1])
-        elif len(args)!=0:
-            raise(Error("Wrong number of inputs provided"))
-
         #calculate the monthly means of that range
         sstMean[key] = domainDs.groupby('time.month', restore_coord_dims=True).mean(dim='time')
         
-      
     return sstMean
 
 def calculateIndex(ds, *args):

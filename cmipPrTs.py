@@ -59,8 +59,14 @@ for model in _model.scenarioMip:
         #anom for piControl
         anomDa=newXr.groupby('time.month')-monMeansDa
         
+        renamedDa=xarray.Dataset()
+        renamedDa['prAnomWinter']=anomDa['pr']
+        renamedDa['prAnomSummer']=anomDa['pr']
+        renamedDa['tsAnomWinter']=anomDa['tas']
+        renamedDa['tsAnomSummer']=anomDa['tas']
+        
         #warmSeasonAv
-        warmSeasonAnomDa=tp.averageForTimePeriod(anomDa)
+        warmSeasonAnomDa=tp.averageForTimePeriod(renamedDa)
         warmSeasonAnomDa['model']=model[1]
         warmSeasonAnomDa = warmSeasonAnomDa.assign_attrs([*warmSeasonAnomDa.attrs, ('units','mm/month'), ('timePeriod','Warm Season')])
         
@@ -106,9 +112,15 @@ for model in _model.scenarioMip:
                 newXr=regridder(domainXr)
 
                 anomDa=newXr.groupby('time.month')-monMeansDa
-
+                
+                renamedDa=xarray.Dataset()
+                renamedDa['prAnomWinter']=anomDa['pr']
+                renamedDa['prAnomSummer']=anomDa['pr']
+                renamedDa['tsAnomWinter']=anomDa['tas']
+                renamedDa['tsAnomSummer']=anomDa['tas']
+                
                 #warmSeasonAv
-                warmSeasonAnomDa=tp.averageForTimePeriod(anomDa)
+                warmSeasonAnomDa=tp.averageForTimePeriod(renamedDa)
                 warmSeasonAnomDa['model']=model[1]
                 warmSeasonAnomDa = warmSeasonAnomDa.assign_attrs([*warmSeasonAnomDa.attrs, ('units','mm/month'), ('timePeriod','Warm Season')])
 

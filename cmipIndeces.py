@@ -68,12 +68,24 @@ pslIndeces = _index.pslIndex
 len(modelSet)
 
 
+def allIndexCalc(sstDs,sstClimat,pslDs,pslClimat):
+    sstIndex = sst.calculateIndex(sstDs, sstClimat) 
+    pslIndex, junk = psl.calculateSamIndex(pslDs, pslClimat)
+
+    pslIndexSeason=xarray.Dataset()
+    pslIndexSeason['samWinter']=pslIndex
+    pslIndexSeason['samSummer']=pslIndex
+
+    monthlyIndeces = xarray.merge([pslIndexSeason, sstIndex])
+    
+    return monthlyIndeces
+
 # Climatology and piControl:
 
 # In[ ]:
 
 
-'''for iModel in modelSet:
+for iModel in modelSet:
     
     print(iModel)
     
@@ -82,7 +94,7 @@ len(modelSet)
         
         print(iModel[1] + ' starting') 
         #SST
-        tsDs = fh.loadModelData(iModel[1], 'tos_Omon', 'piControl', iModel[2])
+        tsDs = fh.loadModelData(iModel[1], 'tos_Omon', 'piControl', iModel[2]).tos
         controlDs=tsDs.assign_attrs({'project_id':'CMIP'})
         sstClimat=sst.calculateClimatology(controlDs)
 
@@ -108,18 +120,19 @@ for iModel in modelSet:
         for i in sstIndeces:
             sstClimat[i]=xarray.open_dataarray('results/cmipMonthlyIndeces/sstTosClimat'+iModel[1]+i+'.nc')
         #the piControl
-        tsDs = fh.loadModelData(iModel[1], 'tos_Omon', 'piControl', iModel[2])
+        tsDs = fh.loadModelData(iModel[1], 'tos_Omon', 'piControl', iModel[2]).tos
         controlDs=tsDs.assign_attrs({'project_id':'CMIP'})
-        sstIndex = sst.calculateIndex(controlDs, sstClimat) 
         
         pslClimat=xarray.open_dataset('results/cmipMonthlyIndeces/pslClimat'+iModel[1]+'.nc')
         pslControlDs=fh.loadModelData(iModel[1], 'psl_Amon', 'piControl', iModel[2])
-        pslIndex, junk = psl.calculateSamIndex(pslControlDs, pslClimat)
         
-        indeces = xarray.merge([pslIndex, sstIndex])
+        monthlyIndeces=allIndexCalc(controlDs,sstClimat,pslControlDs,pslClimat)
+        
+        indeces = tp.averageForTimePeriod(monthlyIndeces)
+        
         indeces.assign_attrs(climatology='full length of pi Control')
         print('Caclulating control ...')
-        tp.averageForTimePeriod(indeces).to_netcdf(
+        indeces.to_netcdf(
             'results/cmipWarmSeasonIndeces/'+iModel[1]+'tospiControl.nc')
         
     except Exception as e:
@@ -140,20 +153,17 @@ for iModel in modelSet:
         sstClimat=dict()
 
         for i in sstIndeces:
-            sstClimat[i]=xarray.open_dataarray('results/cmipMonthlyIndeces/sstTosClimat'+iModel[1]+i+'.nc')
+            sstClimat[i]=xarray.open_dataarray('results/cmipMonthlyIndeces/sstTosClimat'+iModel[1]+i+'.nc').tos
         pslClimat=xarray.open_dataset('results/cmipMonthlyIndeces/pslClimat'+iModel[1]+'.nc')
 
         #historical
-        tsDs = fh.loadModelData(iModel[1], 'tos_Omon', 'historical', iModel[3])
-        #sstDs = xarray.merge([tsDs.ts, fxDs.areacella])
+        tsDs = fh.loadModelData(iModel[1], 'tos_Omon', 'historical', iModel[3]).tos
         sstDs=tsDs.assign_attrs({'project_id':'CMIP'})
-
-        sstIndex = sst.calculateIndex(sstDs, sstClimat) #(reducing the model set at this step could save time?)
-
         pslDs = fh.loadModelData(iModel[1], 'psl_Amon', 'historical',iModel[3])
-        pslIndex, junk = psl.calculateSamIndex(pslDs, pslClimat)
-        indeces = xarray.merge([pslIndex, sstIndex])
+
+        indeces = allIndexCalc(sstDs,sstClimat,pslDs,pslClimat)
         indeces.assign_attrs(climatology='full length of pi Control')
+        
         #print(indeces)
         print('Caclulating historical ...')
 
@@ -171,7 +181,7 @@ for iModel in modelSet:
 
 # In[ ]:
 
-'''
+
 for iModel in modelSet:
     
     print(iModel)
@@ -191,20 +201,15 @@ for iModel in modelSet:
             try:
                 variant = iModel[3]
                 
-                sstDs = fh.loadModelData(iModel[1], 'tos_Omon', experiment, variant).tos.to_dataset()
+                sstDs = fh.loadModelData(iModel[1], 'tos_Omon', experiment, variant).tos
                 sstDs=sstDs.assign_attrs({'project_id':'CMIP'})
 
-                print('Calculating ' + str(experiment) + 'sst')
-                sstIndex = sst.calculateIndex(sstDs, sstClimat).compute()
-                
-                
                 pslDs = fh.loadModelData(iModel[1], 'psl_Amon', experiment,variant).psl.to_dataset()
                 pslDs=pslDs.assign_attrs({'mip_era':'CMIP6'})
-                pslIndex, junk = psl.calculateSamIndex(pslDs, pslClimat)
 
                 indeces = xarray.concat([
                     historicalIndeces, 
-                                         xarray.merge([pslIndex, sstIndex])
+                                         allIndexCalc(sstDs,sstClimat,pslDs,pslCliat)
                     ], 'time')
 
                 indeces.assign_attrs(climatology='full length of pi Control')
