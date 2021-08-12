@@ -89,7 +89,7 @@ for iModel in modelSet:
     
     print(iModel)
     
-    try: 
+    '''try: 
         #calculate climatology
         
         print(iModel[1] + ' starting') 
@@ -138,7 +138,7 @@ for iModel in modelSet:
     except Exception as e:
         print(iModel[1] + "piControl did not calculate")
         print(e)
-
+'''
 # Historical Indeces
 
 # In[ ]:
@@ -153,7 +153,7 @@ for iModel in modelSet:
         sstClimat=dict()
 
         for i in sstIndeces:
-            sstClimat[i]=xarray.open_dataarray('results/cmipMonthlyIndeces/sstTosClimat'+iModel[1]+i+'.nc').tos
+            sstClimat[i]=xarray.open_dataarray('results/cmipMonthlyIndeces/sstTosClimat'+iModel[1]+i+'.nc')
         pslClimat=xarray.open_dataset('results/cmipMonthlyIndeces/pslClimat'+iModel[1]+'.nc')
 
         #historical

@@ -129,16 +129,15 @@ def pcs(solver):
 
 
 
-def ensoPlotter(da, ax):
+def ensoPlotter(da, ax, colorbar=True):
     import cartopy.crs as ccrs
     import cartopy.feature as cfeature
     import matplotlib.pyplot as plt 
-    import numpy
     
-    precContours=numpy.arange(-0.6,0.61,0.1)
+    precContours=numpy.arange(-1.4,1.41,0.2)
     
-    cs=plt.contourf(da.lon, da.lat, da.values, #precContours, 
-                    transform=ccrs.PlateCarree(), cmap='coolwarm', #extend='both' ,
+    cs=plt.contourf(da.lon, da.lat, da.values, precContours, 
+                    transform=ccrs.PlateCarree(), cmap='coolwarm', extend='both' ,
                    )
 
     gl=ax.gridlines(draw_labels=True, linewidth=1, color='gray', alpha=0.5, linestyle=':')
@@ -146,6 +145,9 @@ def ensoPlotter(da, ax):
     gl.top_labels=False
     #gl.left_labels=False
 
+    if colorbar:
         #bottom legend
-    cbar=plt.colorbar(orientation='horizontal', fraction=0.05, pad=0.05)
+        cbar=plt.colorbar(orientation='horizontal', fraction=0.1, pad=0.15)
+        cbar.set_label('°C/unit')
 
+        
