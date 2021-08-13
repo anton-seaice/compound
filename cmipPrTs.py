@@ -59,26 +59,20 @@ for model in _model.scenarioMip:
         #anom for piControl
         anomDa=newXr.groupby('time.month')-monMeansDa
         
-        renamedDa=xarray.Dataset()
-        renamedDa['prAnomWinter']=anomDa['pr']
-        renamedDa['prAnomSummer']=anomDa['pr']
-        renamedDa['tsAnomWinter']=anomDa['tas']
-        renamedDa['tsAnomSummer']=anomDa['tas']
-        
         #warmSeasonAv
-        warmSeasonAnomDa=tp.averageForTimePeriod(renamedDa)
+        warmSeasonAnomDa=tp.averageForTimePeriod(anomDa.rename({'tas':'ts'}))
         warmSeasonAnomDa['model']=model[1]
         warmSeasonAnomDa = warmSeasonAnomDa.assign_attrs([*warmSeasonAnomDa.attrs, ('units','mm/month'), ('timePeriod','Warm Season')])
         
         warmSeasonAnomDa.to_netcdf(
-            'results/cmipWarmSeasonPrTs/'+model[1]+'PiControl.nc')
+            'results/cmipSeasonPrTs/'+model[1]+'PiControl.nc')
     
     
     except Exception as e:
         print(e)
     
     #calculate anomalies for all scenarios
-        for experiment in ['ssp126','ssp245','ssp585']:
+        for experiment in ['ssp585']:
 
             try: 
                 #load it
@@ -113,19 +107,13 @@ for model in _model.scenarioMip:
 
                 anomDa=newXr.groupby('time.month')-monMeansDa
                 
-                renamedDa=xarray.Dataset()
-                renamedDa['prAnomWinter']=anomDa['pr']
-                renamedDa['prAnomSummer']=anomDa['pr']
-                renamedDa['tsAnomWinter']=anomDa['tas']
-                renamedDa['tsAnomSummer']=anomDa['tas']
-                
                 #warmSeasonAv
-                warmSeasonAnomDa=tp.averageForTimePeriod(renamedDa)
+                warmSeasonAnomDa=tp.averageForTimePeriod(anomDa.rename({'tas':'ts'}))
                 warmSeasonAnomDa['model']=model[1]
                 warmSeasonAnomDa = warmSeasonAnomDa.assign_attrs([*warmSeasonAnomDa.attrs, ('units','mm/month'), ('timePeriod','Warm Season')])
 
                 warmSeasonAnomDa.to_netcdf(
-                    'results/cmipWarmSeasonPrTs/'+model[1]+experiment+'.nc')
+                    'results/cmipSeasonPrTs/'+model[1]+experiment+'.nc')
 
             except Exception as e:
                 print(model[1] + experiment + " did not calculate")
