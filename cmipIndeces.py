@@ -52,7 +52,7 @@ experimentSet=[*deckSet, *scenarioSet]
 # In[6]:
 
 
-modelSet=_model.scenarioMip[2:]
+modelSet=_model.scenarioMip[[21,22],:]
 
 
 # In[7]:
@@ -198,7 +198,7 @@ for iModel in modelSet:
         pslClimat=xarray.open_dataset('results/cmipMonthlyIndeces/pslClimat'+iModel[1]+'.nc',chunks='auto')
         
         for experiment in scenarioSet: 
-            #try:
+            try:
                 variant = iModel[3]
                 
                 sstDs = fh.loadModelData(iModel[1], 'tos_Omon', experiment, variant).tos
@@ -225,12 +225,12 @@ for iModel in modelSet:
                     'results/cmipWarmSeasonIndeces/'+iModel[1]+'tos'+experiment+'.nc'
                 )
 
-            #except Exception as e:
-            #    print(iModel[1] + experiment + " not completed: ")
-            #    print(e)
+            except Exception as e:
+                print(iModel[1] + experiment + " not completed: ")
+                print(e)
                 
-            #else:
-            #    print(iModel[1] + experiment + ' complete')  
+            else:
+                print(iModel[1] + experiment + ' complete')  
 
     except Exception as e:
         print(e)

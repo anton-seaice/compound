@@ -72,27 +72,21 @@ def sstAnoms(tsXr, climatXr):
     )
     
     
+    #Fit a quadratic and detrend using it
+    trendXr = tsXr.polyfit('time', 2)
+    trendXr = xarray.polyval(tsXr.time, trendXr.polyfit_coefficients, 'degree')
     
-    climatXr=climatXr.chunk([-1, 'auto', 'auto'])
+    detrendXr=tsXr-trendXr
     
     climatMeans=climatXr.groupby('time.month').mean(dim='time')
     
     #calculate monthly anoms.
-    sstAnomXr=tsXr.groupby('time.month')-climatMeans
+    sstAnomXr=detrendXr.groupby('time.month')-climatMeans
     
     #Rechunk so that time is all in one chunk. Not sure this is useful but it does seem to reduce memory needs
     sstAnomXr=sstAnomXr.chunk([-1, 'auto', 'auto'])
     
-    #Fit a quadratic and detrend using it
-    trendXr = sstAnomXr.polyfit('time', 2)
-    trendXr = xarray.polyval(sstAnomXr.time, trendXr.polyfit_coefficients, 'degree')
-    
-    
-    detrendXr=sstAnomXr-trendXr
-    
-    
-    
-    return detrendXr
+    return sstAnomXr
     
 
 def eofSolver(sstAnomXr): 
