@@ -78,7 +78,7 @@ def sstAnoms(tsXr, climatXr):
     
     detrendXr=tsXr-trendXr
     
-    climatMeans=climatXr.groupby('time.month').mean(dim='time')
+    climatMeans=detrendXr.groupby('time.month').mean(dim='time')
     
     #calculate monthly anoms.
     sstAnomXr=detrendXr.groupby('time.month')-climatMeans

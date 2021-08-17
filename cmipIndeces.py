@@ -52,7 +52,7 @@ experimentSet=[*deckSet, *scenarioSet]
 # In[6]:
 
 
-modelSet=_model.scenarioMip[[21,22],:]
+modelSet=_model.scenarioMip[[22],:]
 
 
 # In[7]:
@@ -85,7 +85,7 @@ def allIndexCalc(sstDs,sstClimat,pslDs,pslClimat):
 # In[ ]:
 
 
-for iModel in modelSet:
+'''for iModel in modelSet:
     
     print(iModel)
     
@@ -180,7 +180,7 @@ for iModel in modelSet:
 # Scenario Indeces
 
 # In[ ]:
-
+'''
 
 for iModel in modelSet:
     

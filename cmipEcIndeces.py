@@ -17,7 +17,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 #the full model set
-modelSet=_model.scenarioMip[31:]
+modelSet=_model.scenarioMip
 
 # For all the models, calculate the alphas and e/c Index
 
@@ -45,7 +45,8 @@ for iModel in modelSet:
     except Exception as e:
         print(e)
     
-    for iExp in ['ssp126', 'ssp245', 'ssp370','ssp585']:#load the ssts from ssp585
+    for iExp in [#'ssp126', 'ssp245', 'ssp370',
+        'ssp585']:#load the ssts from ssp585
         try:
             tsXr = xarray.concat(
                 [
