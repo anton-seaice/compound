@@ -29,11 +29,20 @@ regridXr=xarray.Dataset({'lat': (['lat'], numpy.arange(-50, 0, 1.5)),
                     }
                    )
 
+def domainAndRegrid(sourceXr):
+    domainXr=xr.where(
+                (xr.lat>-50) & (xr.lat<0) & (xr.lon>100) & (xr.lon<170),
+                drop=True
+            )
 
-for model in _model.scenarioMip:
+    #regrid before processing
+    regridder = xe.Regridder(domainXr, regridXr, 'bilinear')
+    return regridder(domainXr)
+
+
+for model in _model.scenarioMip: #[[0,1],:]:
     #Calculate a climatology
     #Based on the control run, calculate monthly anomalies
-    
     try:
         print(model)
         xr = xarray.merge([
@@ -41,82 +50,69 @@ for model in _model.scenarioMip:
             fh.loadModelData(model[1], 'tas_Amon', 'piControl', model[2]).tas
         ], compat='override')
 
-        domainXr=xr.where(
-                (xr.lat>-50) & (xr.lat<0) & (xr.lon>100) & (xr.lon<170),
-                drop=True
-            )
-
-        #regrid before processing
-        regridder = xe.Regridder(domainXr, regridXr, 'bilinear')
-        newXr=regridder(domainXr)
+        newXr=domainAndRegrid(xr)
 
         monMeansDa=newXr.groupby('time.month').mean(dim='time')
         monMeansDa.to_netcdf('results/cmipMonthlyPrTs/monMeans'+model[1]+'.nc')
-
-        monMeansDa=xarray.open_dataset(
-            'results/cmipMonthlyPrTs/monMeans'+model[1]+'.nc')
 
         #anom for piControl
         anomDa=newXr.groupby('time.month')-monMeansDa
         
         #warmSeasonAv
-        warmSeasonAnomDa=tp.averageForTimePeriod(anomDa.rename({'tas':'ts'}))
-        warmSeasonAnomDa['model']=model[1]
-        warmSeasonAnomDa = warmSeasonAnomDa.assign_attrs([*warmSeasonAnomDa.attrs, ('units','mm/month'), ('timePeriod','Warm Season')])
+        seasonAnomDa=tp.averageForTimePeriod(anomDa.rename({'tas':'ts'}))
+        seasonAnomDa['model']=model[1]
+        seasonAnomDa = seasonAnomDa.assign_attrs([
+            *seasonAnomDa.attrs, 
+            ('Pr','mm/day'), 
+        ])
         
-        warmSeasonAnomDa.to_netcdf(
-            'results/cmipSeasonPrTs/'+model[1]+'PiControl.nc')
+        seasonAnomDa.to_netcdf(
+            'results/cmipSeasonPrTs/'+model[1]+'PiControl.nc'
+        )
     
     
     except Exception as e:
         print(e)
-    
+
     #calculate anomalies for all scenarios
-        for experiment in ['ssp585']:
+    for experiment in ['ssp585']:
 
-            try: 
-                #load it
-                monMeansDa=xarray.open_dataset(
-                'results/cmipMonthlyPrTs/monMeans'+model[1]+'.nc')
+        try: 
+            #load it
+            xr = xarray.merge(
+                [
+                    xarray.concat(
+                        [
+                            fh.loadModelData(model[1], 'pr_Amon', 'historical', model[3]), 
+                            fh.loadModelData(model[1], 'pr_Amon', experiment, model[3])
+                        ],
+                    'time').pr*secondsToTimeP,
+                    xarray.concat(
+                        [
+                            fh.loadModelData(model[1], 'tas_Amon', 'historical', model[3]),
+                            fh.loadModelData(model[1], 'tas_Amon', experiment, model[3])
+                        ],
+                    'time').tas
+            ], compat='override')
 
-                xr = xarray.merge(
-                    [
-                        xarray.concat(
-                            [
-                                fh.loadModelData(model[1], 'pr_Amon', 'historical', model[3]), 
-                                fh.loadModelData(model[1], 'pr_Amon', experiment, model[3])
-                            ],
-                        'time').pr*secondsToTimeP,
-                        xarray.concat(
-                            [
-                                fh.loadModelData(model[1], 'tas_Amon', 'historical', model[3]),
-                                fh.loadModelData(model[1], 'tas_Amon', experiment, model[3])
-                            ],
-                        'time').tas
-                ], compat='override')
+            # anoms relative to piControl
+            anomDa=domainAndRegrid(xr).groupby('time.month')-monMeansDa
 
-                        #grab area around Australia
-                domainXr=xr.where(
-                    (xr.lat>-50) & (xr.lat<0) & (xr.lon>100) & (xr.lon<170),
-                    drop=True
-                )
+            #warmSeasonAv
+            seasonAnomDa=tp.averageForTimePeriod(anomDa.rename({'tas':'ts'}))
+            seasonAnomDa['model']=model[1]
+            seasonAnomDa = seasonAnomDa.assign_attrs([
+                *seasonAnomDa.attrs, 
+                ('units','mm/month'), 
+                ('timePeriod','Warm Season')
+            ])
 
-                #regrid before processing
-                regridder = xe.Regridder(domainXr, regridXr, 'bilinear')
-                newXr=regridder(domainXr)
+            seasonAnomDa.to_netcdf(
+                'results/cmipSeasonPrTs/'+model[1]+experiment+'.nc'
+            )
 
-                anomDa=newXr.groupby('time.month')-monMeansDa
-                
-                #warmSeasonAv
-                warmSeasonAnomDa=tp.averageForTimePeriod(anomDa.rename({'tas':'ts'}))
-                warmSeasonAnomDa['model']=model[1]
-                warmSeasonAnomDa = warmSeasonAnomDa.assign_attrs([*warmSeasonAnomDa.attrs, ('units','mm/month'), ('timePeriod','Warm Season')])
-
-                warmSeasonAnomDa.to_netcdf(
-                    'results/cmipSeasonPrTs/'+model[1]+experiment+'.nc')
-
-            except Exception as e:
-                print(model[1] + experiment + " did not calculate")
-                print(e)
+        except Exception as e:
+            print(model[1] + experiment + " did not calculate")
+            print(e)
 
 

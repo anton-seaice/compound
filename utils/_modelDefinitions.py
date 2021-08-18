@@ -36,7 +36,6 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     ['EC-Earth-Consortium', 'EC-Earth3-CC', 'r1i1p1f1', 'r1i1p1f1'],
     ['EC-Earth-Consortium', 'EC-Earth3-Veg', 'r1i1p1f1', 'r1i1p1f1'],
     ['EC-Earth-Consortium', 'EC-Earth3-Veg-LR', 'r1i1p1f1', 'r1i1p1f1'],
-    ['FIO-QLNM','FIO-ESM-2-0','r1i1p1f1','r1i1p1f1'],
     ['NOAA-GFDL', 'GFDL-CM4', 'r1i1p1f1', 'r1i1p1f1'],
     ['NOAA-GFDL', 'GFDL-ESM4', 'r1i1p1f1', 'r1i1p1f1'],
     ['NASA-GISS', 'GISS-E2-1-G', 'r1i1p1f2', 'r1i1p1f2'],
