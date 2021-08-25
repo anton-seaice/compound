@@ -37,7 +37,11 @@ def binSum(da):
         binMid.append(int((firstYear+lastYear)/2))
         # calculate the sum for this year interval
         daInterval = da.sel(year=numpy.arange(firstYear,lastYear))
-        binSum.append(daInterval.sum(dim='year').where(daInterval.isnull().any(dim='year')!=True))
+        binSum.append(
+            daInterval.sum(dim='year').where(
+                daInterval.isnull().any(dim='year')!=True
+            )
+        )
 
     #for the list of means, concat the results into a new xarray with new dimension 'year'
     overlapBinDa=xarray.concat(binSum, 'year')
@@ -57,8 +61,7 @@ def binSum(da):
 def binPlot(da):
     import matplotlib.pyplot as plt
     
-    toPlot=[ #*firePos.attrs['indeces'],
-        *da.attrs['pairs'],'all3']
+    toPlot=['enso+iod', 'enso+sam', 'iod+sam','all3']
     colors=['orange', 'purple', 'green','blue']
     
     dims = list(da.coords)

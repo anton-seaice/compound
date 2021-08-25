@@ -11,10 +11,10 @@ cesmNoRepeats = [*cesmRcp85, '001','004','005','006','007','010','011','012','01
 
 
 
-
 #cmip6
 deckSet=['piControl']#,'historical']
-scenarioSet=['historical','ssp126', 'ssp245', 'ssp370','ssp585']
+scenarioSet=[#'historical','ssp126', 'ssp245', 'ssp370',
+    'ssp585']
 experimentSet=[*deckSet, *scenarioSet]
 scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     ['CSIRO-ARCCSS', 'ACCESS-CM2', 'r1i1p1f1_gn', 'r1i1p1f1_gn'],
@@ -36,7 +36,6 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     ['EC-Earth-Consortium', 'EC-Earth3-CC', 'r1i1p1f1', 'r1i1p1f1'],
     ['EC-Earth-Consortium', 'EC-Earth3-Veg', 'r1i1p1f1', 'r1i1p1f1'],
     ['EC-Earth-Consortium', 'EC-Earth3-Veg-LR', 'r1i1p1f1', 'r1i1p1f1'],
-    ['FIO-QLNM','FIO-ESM-2-0','r1i1p1f1','r1i1p1f1'],
     ['NOAA-GFDL', 'GFDL-CM4', 'r1i1p1f1', 'r1i1p1f1'],
     ['NOAA-GFDL', 'GFDL-ESM4', 'r1i1p1f1', 'r1i1p1f1'],
     ['NASA-GISS', 'GISS-E2-1-G', 'r1i1p1f2', 'r1i1p1f2'],
@@ -71,79 +70,17 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     #['FIO-QLNM', 'FIO-ESM-2-0', 'r1i1p1f1', 'r1i1p1f1'],
     #['KIOST', 'KIOST-ESM', 'r1i1p1f1', 'r1i1p1f1'],
     
-    #cutting this because its badly formatted
-    #,
-    
     # no Tos (no ocean?)
     #['NIMS-KMA', 'KACE-1-0-G', 'r1i1p1f1', 'r2i1p1f1'],
 
     
-#cmip5
-past1000 = [
-    #'bcc-csm1-1',
-    #'CCSM4',
-    'CSIRO-Mk3L-1-2',
-    #'FGOALS-gl',
-    'FGOALS-s2',
-    'GISS-E2-R',
-    'HadCM3',
-    'IPSL-CM5A-LR',
-    'MIROC-ESM',
-    'MPI-ESM-P',
-    'MRI-CGCM3'
-]
-
-historical = [
-    'ACCESS1-3',
-    'bcc-csm1-1',
-    'BNU-ESM',
-    'CanCM4',
-    'CanESM2',
-    #'CCSM4', #Not sure if i should include?
-    'CESM1-BGC',
-    'CESM1-CAM5',
-    'CMCC-CESM',
-    'CMCC-CM',
-    'CMCC-CMS',
-    'CNRM-CM5',
-    'CSIRO-Mk3-6-0',
-    'CSIRO-Mk3L-1-2',
-    'EC-EARTH',
-    'FGOALS-g2',
-    'FGOALS-s2',
-    'FIO-ESM',
-    'GFDL-CM2p1',
-    'GFDL-CM3',
-    'GFDL-ESM2G',
-    'GFDL-ESM2M',
-    'GISS-E2-H',
-    'GISS-E2-R',
-    'HadCM3',
-    'HadGEM2-AO',
-    'HadGEM2-CC',
-    'HadGEM2-ES',
-    'inmcm4',
-    'IPSL-CM5A-LR',
-    'IPSL-CM5A-MR',
-    'IPSL-CM5B-LR',
-    'MIROC5',
-    'MIROC-ESM',
-    'MPI-ESM-LR',
-    'MPI-ESM-MR',
-    'MPI-ESM-P',
-    'MRI-CGCM3',
-    'MRI-ESM1',
-    'NorESM1-M',
-    'NorESM1-ME'
-]
-
 wangsAnswers={'CAMS-CSM1-0':-0.2902, 
     'CMCC-CM2-SR5':-0.4055, 
     'CNRM-CM6-1':-0.1662, 
     'CNRM-ESM2-1':-0.1687,
     'EC-Earth3':-0.2662, 
     'EC-Earth3-Veg':-0.2665, 
-    'FIO-ESM-2-0':-0.3751,
+    #'FIO-ESM-2-0':-0.3751,
     'MIROC6':-0.3198, 
     'MIROC-ES2L': -0.3466,
     'HadGEM3-GC31-LL':-0.1785, 
@@ -155,7 +92,7 @@ wangsAnswers={'CAMS-CSM1-0':-0.2902,
     'CESM2-WACCM':-0.2436, 
     'NorESM2-LM':-0.2505, 
     'NorESM2-MM':-.2077,
-    'GFDL-ESM4':-.1931, 
+    #'GFDL-ESM4':-.1931, 
     'CIESM':-.1886, 
     'MCM-UA-1-0':-0.2888}
 

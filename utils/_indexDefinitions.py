@@ -15,16 +15,18 @@ pslIndex = {
     "sam" : {"lat1":-40, "lat2":-65} 
 }
 
-# This is the months of interest for each index when calculating warm-season averages
+# This is the months of interest for each index when calculating seasonal averages
 monthsOfInterest = {
     "nino3" :[7,15] ,
     "nino34NoDetrend" : [7,15] ,
     "nino4NoDetrend" : [7,15] ,
+    "westIONoDetrend" : [7,12] , 
     "eastIONoDetrend" : [7,12] , 
     "dmi": [7,12] ,
     "nino34" : [7,15] ,
     "nino4" : [7,15] ,
     "eastIO" : [7,12] , 
+    "westIO" : [7,12] , 
     "samSummer" : [10,15] ,
     "samWinter" : [4,9] ,
     "pr" : {'winter':[4,9],'summer':[10,15]} ,
@@ -35,17 +37,25 @@ monthsOfInterest = {
 }
 
 # This is the list of indices which are fire promoting when positive when calculating events
-firePos = ['nino34', 'nino4', 'dmi', 'nino34NoDetrend', 'nino4NoDetrend', 'eIndex','cIndex','NCT', 'NWP', 'samWinter']
+firePos = [
+    'nino34', 'nino4', 'eIndex','cIndex','NCT', 'NWP',
+    'dmi',
+    'samWinter'
+]
 
 # This is indices which are fire promiting when negative in the warm-season when calculating events
 fireNeg = ['samSummer', 'eastIO']
 
 #When calculating compounds, one index each for enso+iod+sam is required
 # List of indices we could use for ENSO
-enso = ['nino3', 'nino34', 'nino4', 'nino3NoDetrend', 'nino34NoDetrend', 'nino4NoDetrend', 'ecCombined', 'eIndex', 'cIndex', 'NCT', 'NWP']
+enso = [
+    'nino3', 'nino34', 'nino4',
+    'ecCombined', 'eIndex', 'cIndex', 
+    'NCT', 'NWP'
+]
 
 # Indices we might use for IOD
-iod = ['dmi', 'eastIO', 'eastIONoDetrend']
+iod = ['dmi', 'eastIO']
 
 # Indices we might use for SAM
 sam = ['samSummer', 'samWinter']

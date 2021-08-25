@@ -52,7 +52,7 @@ experimentSet=[*deckSet, *scenarioSet]
 # In[6]:
 
 
-modelSet=_model.scenarioMip
+modelSet=_model.scenarioMip[[22],:]
 
 
 # In[7]:
@@ -85,11 +85,11 @@ def allIndexCalc(sstDs,sstClimat,pslDs,pslClimat):
 # In[ ]:
 
 
-for iModel in modelSet:
+'''for iModel in modelSet:
     
     print(iModel)
     
-    '''try: 
+    try: 
         #calculate climatology
         
         print(iModel[1] + ' starting') 
@@ -138,7 +138,7 @@ for iModel in modelSet:
     except Exception as e:
         print(iModel[1] + "piControl did not calculate")
         print(e)
-'''
+
 # Historical Indeces
 
 # In[ ]:
@@ -180,7 +180,7 @@ for iModel in modelSet:
 # Scenario Indeces
 
 # In[ ]:
-
+'''
 
 for iModel in modelSet:
     
@@ -209,17 +209,21 @@ for iModel in modelSet:
 
                 indeces = xarray.concat([
                     historicalIndeces, 
-                                         allIndexCalc(sstDs,sstClimat,pslDs,pslCliat)
-                    ], 'time')
+                    allIndexCalc(sstDs,sstClimat,pslDs,pslClimat)
+                ], 'time')
 
                 indeces.assign_attrs(climatology='full length of pi Control')
-                indeces.to_netcdf('results/cmipMonthlyIndeces/'+iModel[1]+'tos'+experiment+'.nc')
+                indeces.to_netcdf(
+                    'results/cmipMonthlyIndeces/'+iModel[1]+'tos'+experiment+'.nc'
+                )
                 #print(indeces)
                 print('Caclulating warm season avs and Writing to disk')
                 
                 answer=tp.averageForTimePeriod(indeces)
                 
-                answer.to_netcdf('results/cmipWarmSeasonIndeces/'+iModel[1]+'tos'+experiment + '.nc')
+                answer.to_netcdf(
+                    'results/cmipWarmSeasonIndeces/'+iModel[1]+'tos'+experiment+'.nc'
+                )
 
             except Exception as e:
                 print(iModel[1] + experiment + " not completed: ")

@@ -132,12 +132,33 @@ def compound(inputDa):
                                        )#horrorshow?
 
         fireDa['anyCompound']=xarray.where(fireDa.nEvents.isnull(), float('NaN'), (fireDa.nEvents>1).astype('int') )
+        fireDa=fireDa.assign_attrs({
+            'indexNames':indexNames,
+            'indeces':['enso','iod','sam'], 
+            'pairs':pairs, 
+            'others':['all3','anyCompound','nEvents']
+        })
         
-        allFireLs.append(fireDa.to_array(dim='compound', name=iSet))
+        
+        allFireLs.append(
+            fireDa.to_array(
+                dim='compound',
+                name=iSet
+            ).assign_attrs({
+                'indexNames':indexNames,
+                'indeces':['enso','iod','sam'], 
+                'pairs':pairs, 
+                'others':['all3','anyCompound','nEvents']
+            })
+        )
             
             
     outputXr = xarray.merge(allFireLs)
-    outputXr=outputXr.assign_attrs({'indeces':['enso','iod','sam'], 'pairs':pairs, 'others':['all3','anyCompound','nEvents']})
+    
+    outputXr=outputXr.assign_attrs({
+        *inputDa.attrs,
+    })
+    
     
     return outputXr
 
