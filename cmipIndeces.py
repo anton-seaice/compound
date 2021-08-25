@@ -135,7 +135,7 @@ for iModel in modelSet:
         indeces.assign_attrs(climatology='full length of pi Control')
         print('Caclulating control ...')
         indeces.to_netcdf(
-            'results/cmipWarmSeasonIndeces/'+iModel[1]+'tospiControl.nc')
+            'results/cmipSeasonIndeces/'+iModel[1]+'tospiControl.nc')
         
     except Exception as e:
         print(iModel[1] + "piControl did not calculate")
@@ -171,7 +171,7 @@ for iModel in modelSet:
 
         #save the results to file
         indeces.to_netcdf('results/cmipMonthlyIndeces/'+iModel[1]+'toshistorical.nc')
-        tp.averageForTimePeriod(indeces).to_netcdf('results/cmipWarmSeasonIndeces/'+iModel[1]+'toshistorical.nc')
+        tp.averageForTimePeriod(indeces).to_netcdf('results/cmipSeasonIndeces/'+iModel[1]+'toshistorical.nc')
 
     except Exception as e:
         print(iModel[1] + "historical did not calculate")
@@ -224,7 +224,7 @@ for iModel in modelSet:
                 answer=tp.averageForTimePeriod(indeces)
                 
                 answer.to_netcdf(
-                    'results/cmipWarmSeasonIndeces/'+iModel[1]+'tos'+experiment+'.nc'
+                    'results/cmipSeasonIndeces/'+iModel[1]+'tos'+experiment+'.nc'
                 )
 
             except Exception as e:
