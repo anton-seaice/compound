@@ -115,4 +115,34 @@ for model in _model.scenarioMip: #[[0,1],:]:
             print(model[1] + experiment + " did not calculate")
             print(e)
 
+#calculate seasonal means too
+            
+#open the monthly data
+monMeansXr=xarray.concat(
+    [xarray.open_dataset('results/cmipMonthlyPrTs/monMeans'+iModel+'.nc') for iModel in _model.scenarioMip[:,1]], 
+    'model',
+    coords='minimal', 
+    compat='override'
+).drop('height').rename({'tas':'ts'})
 
+#calculate warm and cool season mean
+meanXr=xarray.Dataset()
+
+for iVar in ['pr','ts']:
+    months=_index.monthsOfInterest[iVar]
+    for iSeason in list(months.keys()):
+        iMonths=months[iSeason].copy()
+        print(iMonths)
+        if iMonths[1]>12:
+            iMonths[1]=iMonths[1]-12
+            meanXr[iVar+iSeason.capitalize()]=monMeansXr[iVar].where(
+                (monMeansXr.month>=iMonths[0])
+                + (monMeansXr.month<=iMonths[1])
+            ).mean('month')
+        else:
+            meanXr[iVar+iSeason.capitalize()]=monMeansXr[iVar].where(
+                (monMeansXr.month>=iMonths[0])
+                *(monMeansXr.month<=iMonths[1])
+            ).mean('month')
+
+meanXr.to_netcdf('results/cmip6PrTsMeans.nc')

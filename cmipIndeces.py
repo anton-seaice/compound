@@ -52,7 +52,7 @@ experimentSet=[*deckSet, *scenarioSet]
 # In[6]:
 
 
-modelSet=_model.scenarioMip[[22],:]
+modelSet=_model.scenarioMip#[[22],:]
 
 
 # In[7]:
@@ -109,7 +109,7 @@ def allIndexCalc(sstDs,sstClimat,pslDs,pslClimat):
     except Exception as e:
         print(iModel[1] + "Climatology did not calculate")
         print(e)
-
+'''
 
 for iModel in modelSet:
     
@@ -128,6 +128,8 @@ for iModel in modelSet:
         
         monthlyIndeces=allIndexCalc(controlDs,sstClimat,pslControlDs,pslClimat)
         
+        monthlyIndeces.to_netcdf('results/cmipMonthlyIndeces/'+iModel[1]+'tospiControl.nc')
+        
         indeces = tp.averageForTimePeriod(monthlyIndeces)
         
         indeces.assign_attrs(climatology='full length of pi Control')
@@ -142,7 +144,7 @@ for iModel in modelSet:
 # Historical Indeces
 
 # In[ ]:
-
+'''
 
 for iModel in modelSet:
     
@@ -180,7 +182,7 @@ for iModel in modelSet:
 # Scenario Indeces
 
 # In[ ]:
-'''
+
 
 for iModel in modelSet:
     
@@ -237,3 +239,4 @@ for iModel in modelSet:
         
     else:
         print(iModel[1] + ' finished')
+'''
