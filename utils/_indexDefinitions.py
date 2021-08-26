@@ -17,7 +17,7 @@ pslIndex = {
 
 # This is the months of interest for each index when calculating seasonal averages
 monthsOfInterest = {
-    "nino3" :[7,15] ,
+    #"nino3" :[7,15] ,
     "nino34NoDetrend" : [7,15] ,
     "nino4NoDetrend" : [7,15] ,
     "westIONoDetrend" : [7,12] , 

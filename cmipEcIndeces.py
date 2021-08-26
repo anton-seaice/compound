@@ -17,7 +17,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 #the full model set
-modelSet=_model.scenarioMip
+modelSet=_model.scenarioMip[[0],:]
 
 # For all the models, calculate the alphas and e/c Index
 
@@ -29,10 +29,8 @@ for iModel in modelSet:
         climatXr=fh.loadModelData(iModel[1], 'tos_Omon', 'piControl', iModel[2]).tos
         climatXr=climatXr.assign_attrs({'project_id':'CMIP'})
                 
-        tsXr=climatXr
-        
         #Calculate anomalies using piControl baseline
-        sstAnomXr=ec.sstAnoms(tsXr, climatXr)
+        sstAnomXr=ec.sstAnoms(climatXr, climatXr)
         
         #create the solver
         solver=ec.eofSolver(sstAnomXr)
@@ -60,7 +58,7 @@ for iModel in modelSet:
             sstAnomXr=ec.sstAnoms(tsXr, climatXr)
 
             #project these anomalies onto the Eofs from piControl
-            expPcs=solver.projectField(sstAnomXr)
+            expPcs=solver.projectField(sstAnomXr, neofs=2)
 
             #reformat for consistency
             indeces = xarray.merge([expPcs.sel(mode=0, drop=True).rename('pc1'),

@@ -77,8 +77,8 @@ def sstAnoms(tsXr, climatXr):
     sstAnomXr=tsXr.groupby('time.month')-climatMeans
     
     #Fit a quadratic and detrend using it
-    trendXr = sstAnomXr.polyfit('time', 2)
-    trendXr = xarray.polyval(sstAnomXr.time, trendXr.polyfit_coefficients, 'degree')
+    polynXr = sstAnomXr.polyfit('time', 2)
+    trendXr = xarray.polyval(sstAnomXr.time, polynXr.polyfit_coefficients, 'degree')
     
     detrendXr=sstAnomXr-trendXr
     
@@ -95,7 +95,7 @@ def eofSolver(sstAnomXr):
     #weights = numpy.cos(numpy.deg2rad(sstAnomXr.lat)
     #            ).values[..., numpy.newaxis]
     
-    return Eof(sstAnomXr) #, weights=weights)
+    return Eof(sstAnomXr, center=False) #, weights=weights)
 
 
 def pcs(solver):
@@ -112,9 +112,10 @@ def pcs(solver):
     
     eofsXr = solver.eofsAsCorrelation(neofs=2) #eofscaling=1
     
-    indeces = xarray.merge([pcTimeXr.sel(mode=0, drop=True).rename('pc1'),
-                            pcTimeXr.sel(mode=1, drop=True).rename('pc2'), 
-                           ])
+    indeces = xarray.merge([
+        pcTimeXr.sel(mode=0, drop=True).rename('pc1'),
+        pcTimeXr.sel(mode=1, drop=True).rename('pc2'), 
+    ])
     indeces['alpha']=alpha
     
     return indeces, pFit, eofsXr
