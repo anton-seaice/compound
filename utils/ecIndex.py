@@ -35,7 +35,6 @@ def sstAnomsWang(tsXr):
     tsXr=tsXr.where(
         (tsXr.time.dt.year>=1900) & (tsXr.time.dt.year<2100), drop=True
     )
-
     
     #Rechunk so that time is all in one chunk. Not sure this is useful but it does seem to reduce memory needs
     tsXr=tsXr.chunk(-1, 'auto', 'auto')
@@ -52,11 +51,11 @@ def sstAnomsWang(tsXr):
 def sstAnoms(tsXr, climatXr):
     ''' sst Anoms using two datasets provided'''
     
-    #calculate average between -20 and 20 globall to detrend with
-    #trendXr=sst.calculateIndex(
-    #            tsXr.to_dataset().assign_attrs({'project_id':'CMIP'}), 
-    #            sst.calculateClimatology(climatXr.to_dataset().assign_attrs({'project_id':'CMIP'}))
-     #                           ).backgroundSstNoDetrend.chunk('auto')
+    #calculate average anomaly between -20 and 20 globall to detrend with
+    trendXr=sst.calculateIndex(
+        tsXr, 
+        sst.calculateClimatology(climatXr)
+    ).backgroundSstNoDetrend.chunk('auto')
     
     #Area of interest for ec Indeces
     tsXr=tsXr.where(
@@ -77,8 +76,8 @@ def sstAnoms(tsXr, climatXr):
     sstAnomXr=tsXr.groupby('time.month')-climatMeans
     
     #Fit a quadratic and detrend using it
-    polynXr = sstAnomXr.polyfit('time', 2)
-    trendXr = xarray.polyval(sstAnomXr.time, polynXr.polyfit_coefficients, 'degree')
+    #polynXr = sstAnomXr.polyfit('time', 2)
+    #trendXr = xarray.polyval(sstAnomXr.time, polynXr.polyfit_coefficients, 'degree')
     
     detrendXr=sstAnomXr-trendXr
     
@@ -92,8 +91,8 @@ def eofSolver(sstAnomXr):
     
     sstAnomXr.load()
     
-    #weights = numpy.cos(numpy.deg2rad(sstAnomXr.lat)
-    #            ).values[..., numpy.newaxis]
+    weights = numpy.cos(numpy.deg2rad(sstAnomXr.lat)
+                ).values[..., numpy.newaxis]
     
     return Eof(sstAnomXr, center=False) #, weights=weights)
 
@@ -143,5 +142,5 @@ def ensoPlotter(da, ax, colorbar=True):
         #bottom legend
         cbar=plt.colorbar(orientation='horizontal', fraction=0.1, pad=0.15)
         cbar.set_label('°C/unit')
-
-        
+    
+    return cs

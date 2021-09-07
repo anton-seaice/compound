@@ -29,7 +29,10 @@ def sstDomain(ds, indexKey):
     #Carve out the area of interest for this index
     #https://www.cesm.ucar.edu/models/ccsm3.0/csim/RefGuide/ice_refdoc/node9.html describes TLAT/TLONG. They are in the middle of a grid square in the model.
     domainDs=ds.where(
-        (ds.lat>domain['latMin']) & (ds.lat<domain['latMax']) & (ds.lon>domain['longMin']) & (ds.lon<domain['longMax']),
+        (ds.lat>domain['latMin']) 
+        & (ds.lat<domain['latMax']) 
+        & (ds.lon>domain['longMin']) 
+        & (ds.lon<domain['longMax']),
         drop=True
     )
 
@@ -66,7 +69,9 @@ def calculateClimatology(climatDs, *args):
         domainDs=sstDomain(climatDs, key)
         
         #calculate the monthly means of that range
-        sstMean[key] = domainDs.groupby('time.month', restore_coord_dims=True).mean(dim='time')
+        sstMean[key] = domainDs.groupby(
+            'time.month', restore_coord_dims=True
+        ).mean(dim='time')
         
     return sstMean
 
@@ -139,25 +144,29 @@ def calculateIndex(ds, *args):
 
         #if there were two arguments given for climatology, use the same data
         if len(args)==2:
-                domainSstClimat=climat.dateInterval(domainDs, int(args[0]), int(args[1]))
-                sstIndexMean = domainSstClimat.groupby('time.month', restore_coord_dims=True).mean(dim='time')
+                domainSstClimat=climat.dateInterval(
+                    domainDs, int(args[0]), int(args[1])
+                )
+                sstIndexMean = domainSstClimat.groupby(
+                                'time.month', restore_coord_dims=True
+                            ).mean(dim='time')
         else:
             #otherwise, use the provided climatology
             sstIndexMean=climatDs[key]
         
         # caluclate the sst anomolies 
-        sstAnomDs=domainDs.groupby('time.month', restore_coord_dims=True
+        sstAnomDs=domainDs.groupby(
+            'time.month', restore_coord_dims=True
         )-sstIndexMean
 
         # to calculate an area weight average, using TAREA is best, but lots of data sets don't seem to have this, so weighting by the cosine of the latitude
         #http://xarray.pydata.org/en/stable/examples/area_weighted_temperature.html
         weights=numpy.cos(numpy.deg2rad(domainDs.lat))
-        #weights=domainDs.TAREA
         
         #Then calculate a weighted mean
+        #dimsNotTime is ['lon','lat'] generally
         dimsNotTime=set(sstAnomDs.dims).difference(['time'])
         resultDs[key+'NoDetrend']=sstAnomDs.weighted(weights).mean(dim=dimsNotTime)
-        
         
     # Special case for iod
     resultDs['dmi'] = resultDs['westIONoDetrend'] - resultDs['eastIONoDetrend']

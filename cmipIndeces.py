@@ -72,11 +72,7 @@ def allIndexCalc(sstDs,sstClimat,pslDs,pslClimat):
     sstIndex = sst.calculateIndex(sstDs, sstClimat) 
     pslIndex, junk = psl.calculateSamIndex(pslDs, pslClimat)
 
-    pslIndexSeason=xarray.Dataset()
-    pslIndexSeason['samWinter']=pslIndex
-    pslIndexSeason['samSummer']=pslIndex
-
-    monthlyIndeces = xarray.merge([pslIndexSeason, sstIndex])
+    monthlyIndeces = xarray.merge([pslIndex, sstIndex])
     
     return monthlyIndeces
 
@@ -84,8 +80,8 @@ def allIndexCalc(sstDs,sstClimat,pslDs,pslClimat):
 
 # In[ ]:
 
-
-'''for iModel in modelSet:
+'''
+for iModel in modelSet:
     
     print(iModel)
     
@@ -113,7 +109,7 @@ def allIndexCalc(sstDs,sstClimat,pslDs,pslClimat):
 
 for iModel in modelSet:
     
-    try:
+    '''try:
         print(iModel)
         sstClimat=dict()
 
@@ -127,7 +123,6 @@ for iModel in modelSet:
         pslControlDs=fh.loadModelData(iModel[1], 'psl_Amon', 'piControl', iModel[2])
         
         monthlyIndeces=allIndexCalc(controlDs,sstClimat,pslControlDs,pslClimat)
-        
         monthlyIndeces.to_netcdf('results/cmipMonthlyIndeces/'+iModel[1]+'tospiControl.nc')
         
         indeces = tp.averageForTimePeriod(monthlyIndeces)
@@ -139,12 +134,12 @@ for iModel in modelSet:
         
     except Exception as e:
         print(iModel[1] + "piControl did not calculate")
-        print(e)
+        print(e) 
 
 # Historical Indeces
 
 # In[ ]:
-'''
+
 
 for iModel in modelSet:
     
@@ -171,6 +166,10 @@ for iModel in modelSet:
 
         #save the results to file
         indeces.to_netcdf('results/cmipMonthlyIndeces/'+iModel[1]+'toshistorical.nc')
+        
+        
+        indeces=xarray.open_dataset('results/cmipMonthlyIndeces/'+iModel[1]+'toshistorical.nc')
+        
         tp.averageForTimePeriod(indeces).to_netcdf('results/cmipSeasonIndeces/'+iModel[1]+'toshistorical.nc')
 
     except Exception as e:
@@ -178,7 +177,7 @@ for iModel in modelSet:
         print(e)
         
 
-
+'''
 # Scenario Indeces
 
 # In[ ]:
@@ -239,4 +238,3 @@ for iModel in modelSet:
         
     else:
         print(iModel[1] + ' finished')
-'''
