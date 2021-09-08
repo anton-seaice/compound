@@ -71,7 +71,7 @@ def compound(inputDa):
         raise EnvironmentError('no sam indeces found')
         
     indexSets=dict()
-    #nest for loops are the besssttt
+    #nested for loops are the besssttt
     for iEnso in ensoIndex:
         for iIod in iodIndex:
             for iSam in samIndex:

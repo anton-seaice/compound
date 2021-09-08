@@ -42,7 +42,6 @@ firePos = [
     'samWinter'
 ]
 
-# This is indices which are fire promiting when negative in the warm-season when calculating events
 fireNeg = ['samSummer', 'eastIO']
 
 #When calculating compounds, one index each for enso+iod+sam is required
