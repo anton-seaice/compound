@@ -37,7 +37,7 @@ monthsOfInterest = {
 
 # This is the list of indices which are fire promoting when positive when calculating events
 firePos = [
-    'nino34', 'nino4', 'eIndex','cIndex','NCT', 'NWP',
+    'nino3','nino34', 'nino4', 'eIndex','cIndex','NCT', 'NWP',
     'dmi',
     'samWinter'
 ]
