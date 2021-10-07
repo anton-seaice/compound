@@ -1,11 +1,0 @@
---2021-08-05 15:40:06--  http://www.nerc-bas.ac.uk/public/icd/gjma/newsam.1957.2007.txt
-Resolving www.nerc-bas.ac.uk (www.nerc-bas.ac.uk)... 194.66.5.50
-Connecting to www.nerc-bas.ac.uk (www.nerc-bas.ac.uk)|194.66.5.50|:80... connected.
-HTTP request sent, awaiting response... 200 OK
-Length: 5046 (4.9K) [text/plain]
-Saving to: ‘newsam.1957.2007.txt’
-
-newsam.1957.2007.txt                          0%[                                                                                           ]       0  --.-KB/s               newsam.1957.2007.txt                        100%[==========================================================================================>]   4.93K  --.-KB/s    in 0s      
-
-2021-08-05 15:40:07 (518 MB/s) - ‘newsam.1957.2007.txt’ saved [5046/5046]
-
