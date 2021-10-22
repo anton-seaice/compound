@@ -157,7 +157,7 @@ def loadModelData(model, variable, test,*args, **kargs):
     #other cmip5
     #elif test=='past1000' or test=='historical' or test=='piControl':
     else:
-        filterTerm = variable + '_.*?'+model+'_'+test+'_'+variant+'_'+grid+'_.*'#'?\.nc' # if CMIP table not specified, its assumed from .+?
+        filterTerm = variable + '_.*?'+model+'_'+test+'_'+variant+'_'+grid+'.*'#'?\.nc' # if CMIP table not specified, its assumed from .+?
         directory = constructDirectoryPath(test, 'MON', variable)
 
 #Second get an list of paths for that filer term and directory  
@@ -186,13 +186,16 @@ def loadModelData(model, variable, test,*args, **kargs):
             try:
                 #print(model+test+variant+variable+dateFolder[-2])
                 path = path + dateFolder[-2]
+                print(path)
             except:
                 print("Not found on Gadi")
                 print(path)
                 print(dateFolder)
-        find=(subprocess.run(['find',path,'-regex','.*\\'+filterTerm],
+        find=(subprocess.run(['find',path,'-regex','.*'+filterTerm],
                              capture_output=True).stdout)
+        print(find)
         paths=find.decode("utf-8").split('\n')[:-1]
+        print(paths)
         #if nothing make a request file
         if len(paths)==0:
             print('Making request file')

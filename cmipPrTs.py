@@ -43,7 +43,7 @@ def domainAndRegrid(sourceXr):
 for model in _model.scenarioMip: #[[0,1],:]:
     #Calculate a climatology
     #Based on the control run, calculate monthly anomalies
-    try:
+    '''try:
         print(model)
         xr = xarray.merge([
             fh.loadModelData(model[1], 'pr_Amon', 'piControl', model[2]).pr*secondsToTimeP,
@@ -73,7 +73,7 @@ for model in _model.scenarioMip: #[[0,1],:]:
     
     except Exception as e:
         print(e)
-
+    '''
     #calculate anomalies for all scenarios
     for experiment in ['ssp585']:
 
