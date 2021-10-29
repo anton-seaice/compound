@@ -38,7 +38,7 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     ['EC-Earth-Consortium', 'EC-Earth3-Veg-LR', 'r1i1p1f1', 'r1i1p1f1'],
     ['NOAA-GFDL', 'GFDL-CM4', 'r1i1p1f1', 'r1i1p1f1'],
     ['NOAA-GFDL', 'GFDL-ESM4', 'r1i1p1f1', 'r1i1p1f1'],
-    ['NASA-GISS', 'GISS-E2-1-G', 'r1i1p1f2', 'r1i1p1f2'],
+    #['NASA-GISS', 'GISS-E2-1-G', 'r1i1p1f2', 'r1i1p1f2'],
     ['MOHC', 'HadGEM3-GC31-LL', 'r1i1p1f1', 'r1i1p1f3'], #NB the piControl used a slightly older version of the forcings.
     ['MOHC', 'HadGEM3-GC31-MM', 'r1i1p1f1', 'r1i1p1f3'],
     ['INM', 'INM-CM4-8', 'r1i1p1f1', 'r1i1p1f1'],
@@ -50,7 +50,7 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     ['MPI-M', 'MPI-ESM1-2-HR', 'r1i1p1f1', 'r1i1p1f1'],
     ['MPI-M', 'MPI-ESM1-2-LR', 'r1i1p1f1', 'r1i1p1f1'],
     ['MRI', 'MRI-ESM2-0', 'r1i1p1f1_gn', 'r1i1p1f1_gn'],
-    ['NUIST', 'NESM3', 'r1i1p1f1', 'r1i1p1f1'],
+    #['NUIST', 'NESM3', 'r1i1p1f1', 'r1i1p1f1'],
     ['NCC', 'NorESM2-LM', 'r1i1p1f1', 'r1i1p1f1'],
     ['NCC', 'NorESM2-MM', 'r1i1p1f1', 'r1i1p1f1'],
     ['MOHC', 'UKESM1-0-LL', 'r1i1p1f2', 'r1i1p1f2']

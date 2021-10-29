@@ -40,10 +40,10 @@ def domainAndRegrid(sourceXr):
     return regridder(domainXr)
 
 
-for model in _model.scenarioMip: #[[0,1],:]:
+'''for model in _model.scenarioMip: #[[0,1],:]:
     #Calculate a climatology
     #Based on the control run, calculate monthly anomalies
-    '''try:
+    try:
         print(model)
         xr = xarray.merge([
             fh.loadModelData(model[1], 'pr_Amon', 'piControl', model[2]).pr*secondsToTimeP,
@@ -73,8 +73,9 @@ for model in _model.scenarioMip: #[[0,1],:]:
     
     except Exception as e:
         print(e)
-    '''
+
     #calculate anomalies for all scenarios
+    
     for experiment in ['ssp585']:
 
         try: 
@@ -114,7 +115,7 @@ for model in _model.scenarioMip: #[[0,1],:]:
         except Exception as e:
             print(model[1] + experiment + " did not calculate")
             print(e)
-
+'''
 #calculate seasonal means too
             
 #open the monthly data
@@ -124,6 +125,8 @@ monMeansXr=xarray.concat(
     coords='minimal', 
     compat='override'
 ).drop('height').rename({'tas':'ts'})
+
+monMeansXr['model']=_model.scenarioMip[:,1]
 
 #calculate warm and cool season mean
 meanXr=xarray.Dataset()
