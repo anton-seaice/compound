@@ -12,7 +12,7 @@ import utils.timePeriod as tp
 import xarray
 import numpy
 import cftime
-import xesmf as xe #this is the regrid package
+import xesmf as xe 
 
 #turn off warnings
 import warnings
@@ -24,10 +24,10 @@ secondsPerDay = 60*60*24
 secondsToTimeP = secondsPerDay #seconds per day, convert m to mm
 
 #the lon/lat grid we are going to use for all models
-regridXr=xarray.Dataset({'lat': (['lat'], numpy.arange(-50, 0, 1.5)),
-                     'lon': (['lon'], numpy.arange(100, 170, 1.5)),
-                    }
-                   )
+regridXr=xarray.Dataset({
+    'lat': (['lat'], numpy.arange(-50, 0, 1.5)),
+    'lon': (['lon'], numpy.arange(100, 170, 1.5)),
+    })
 
 def domainAndRegrid(sourceXr):
     domainXr=xr.where(
@@ -40,7 +40,7 @@ def domainAndRegrid(sourceXr):
     return regridder(domainXr)
 
 
-'''for model in _model.scenarioMip: #[[0,1],:]:
+for model in _model.scenarioMip: #[[0,1],:]:
     #Calculate a climatology
     #Based on the control run, calculate monthly anomalies
     try:
@@ -115,7 +115,7 @@ def domainAndRegrid(sourceXr):
         except Exception as e:
             print(model[1] + experiment + " did not calculate")
             print(e)
-'''
+
 #calculate seasonal means too
             
 #open the monthly data

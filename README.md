@@ -25,20 +25,17 @@ numpy 1.17.0
 cartopy 0.18.0
 eofs-1.4.0
 nc-time-axis 1.3.1
-xesmf
+xesmf 0.5.3
+matplotlib 3.4.2
 
-To Run:
 
-output from cesmIndeces is needed for all other cesm analysis
-output from cesmPrecTsMonthly is needed for cesmCompoundsImpact
+CESM Descriptions:
 
-similarly, output from cmipIndeces and cmipPrTs is needed for the other workbooks.
-
-Descriptions:
-
-1. cesmIndeces/cmipIndeces
+1. cesmIndeces/cesmPrecTsMonthly
 - Calculates monthly indeces (for indeces included in utils/_indexDefinitions.py)
-- Calculates warm season averages (time periods defined in utils/_indexDefinitions.py)
+- Calculates seasonal averages (time periods defined in utils/_indexDefinitions.py)
+This will attempt to pull the CESM-LME results from an external harddrive, you would need to fix the paths if you re-run these.
+The output from these files is saved in results/cesmTradIndeces.nc, results/cesmPrecAnoms.nc and results/cesmTsAnoms.nc
 
 2. cesmCompounds
 - Plots of annual trends in enso, iod, sam
@@ -48,40 +45,30 @@ Descriptions:
 3. cesmCompoundsType
 - Plots of 30 years trends in compounding events, seperated by event type (i.e. on of the three pairs or all3)
 
-4. cesmPrecTsMonthly
-- Calculates warm season averages for prec and Ts
+4. cesmCompoundImpacts
+- Rainfall and Temp anomaly maps for each individial event type, and each compound event type ( I think this needs updating to show seperate cool season and warm season impacts).
 
-5. cesmCompoundImpacts
-- Rainfall and Temp anomalies for each individial event type, and each compound event type
+CMIP6 Descriptuons
 
-Source data:
-- CESM-LME ensemble outputs
-- CMIP6 piControl/historical/ssp outputs
+1. cmipIndeces.py, cmipEcIndeces.py and cmipPrTs.py
+- Calulcates monthly indeces and seasonal averages
+This will attempt the pull the CMIP results from gadi, for the models defined in utils/_modelDefinitions.py. These paths may well be broken / need updating. This uses helpers/fileHandler.py, which is very messy/needs a rewrite.
+The output from these files is saved in results/cmipEcIndex/, results/cmipSeasonIndeces, cmipSeasonPrTs
 
+2. cmipIndeces
+- Plots of individual indeces, and looks at impact of detrending and comparisons between IOD/ENSO indices
 
-Useful git commands:
+2a. cmipEcIndeces
+- plots of EcIndeces for each model to check the sign is correct and save the output
 
-normal commit: git commit -m "message", git add
-add changed files only: git add -u
-tagging: git tag v1.0 ; git push --tags
+3. cmipEvents
+- Calculate individal and compound events from the indeces
 
+4. cmipCompounds
+- Plot of compound event frequencies
 
-Undo a commit & redo
+5. cmipCompoundsImpact
+- rainfall and temperature impacts from compound events
 
-$ git commit -m "Something terribly misguided" # (0: Your Accident)
-$ git reset HEAD~                              # (1)
-[ edit files as necessary ]                    # (2)
-$ git add .                                    # (3)
-$ git commit -c ORIG_HEAD                      # (4)
-
-    This command is responsible for the undo. It will undo your last commit while leaving your working tree (the state of your files on disk) untouched. You'll need to add them again before you can commit them again).
-
-    Make corrections to working tree files.
-
-    git add anything that you want to include in your new commit.
-
-    Commit the changes, reusing the old commit message. reset copied the old head to .git/ORIG_HEAD; commit with -c ORIG_HEAD will open an editor, which initially contains the log message from the old commit and allows you to edit it. If you do not need to edit the message, you could use the -C option.
-
-Alternatively, to edit the previous commit (or just its commit message), commit --amend will add changes within the current index to the previous commit.
-
-To remove (not revert) a commit that has been pushed to the server, rewriting history with git push origin master --force is necessary.
+6. cmipImpact
+- long term rainfall and temperautre trends, and impacts from individual events in different indeces

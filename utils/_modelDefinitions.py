@@ -7,10 +7,6 @@ cesmRcp85 = ['LME.002', 'LME.003', 'LME.008', 'LME.009']
 cesmAll = [*cesmRcp85, cesmCntl, *cesmFullForcings]
 cesmNoRepeats = [*cesmRcp85, '001','004','005','006','007','010','011','012','013']
 
-
-
-
-
 #cmip6
 deckSet=['piControl']#,'historical']
 scenarioSet=[#'historical','ssp126', 'ssp245', 'ssp370',
@@ -56,7 +52,7 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     ['MOHC', 'UKESM1-0-LL', 'r1i1p1f2', 'r1i1p1f2']
 ])
 
-##no SSP 585
+    ##no SSP 585
     #['EC-Earth-Consortium', 'EC-Earth3-AerChem', 'r1i1p1f1', 'r1i1p1f1'],
     #['IPSL', 'IPSL-CM5A2-INCA', 'r1i1p1f1', 'r1i1p1f1'],
     #['HAMMOZ-Consortium', 'MPI-ESM-1-2-HAM', 'r1i1p1f1', 'r1i1p1f1'],
@@ -74,6 +70,7 @@ scenarioMip=numpy.array([ #Institution, Model, deckSetVariant, scenarioVariant
     #['NIMS-KMA', 'KACE-1-0-G', 'r1i1p1f1', 'r2i1p1f1'],
 
     
+#calculated alpha values from Wang et al 2020 for CMIP6 models calculating E and C index.
 wangsAnswers={'CAMS-CSM1-0':-0.2902, 
     'CMCC-CM2-SR5':-0.4055, 
     'CNRM-CM6-1':-0.1662, 

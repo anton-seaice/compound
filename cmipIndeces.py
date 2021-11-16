@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-# # Calculate CMIP Indeces
 
-# This file 
-# 1. calculates all the indeces for all months for all cesmFullForcingFiles.
-# 
-# 
+# # 1. Calculate CMIP Indeces
 
-# In[2]:
+# For each experiment in historical, calculate indices
 
 
 #import my functions
@@ -21,51 +17,27 @@ import utils.timePeriod as tp
 import utils.compound as compound
 
 
-# In[3]:
-
-
+# other good functions
 import xarray
 import numpy
 import matplotlib.pyplot as plt
 
-
-# In[4]:
-
-
+# turn off warnings due to slicing warnings from xarray
 import warnings
 warnings.filterwarnings('ignore')
 
-
-# # 1. Calculate CMIP Indeces
-
-# For each experiment in historical, calculate indices
-
-# In[5]:
-
-
+#experiments
 deckSet=['piControl','historical']
 scenarioSet=[#'ssp126', 'ssp245', 'ssp370',
              'ssp585']
 experimentSet=[*deckSet, *scenarioSet]
 
-
-# In[6]:
-
-
+#model names and variants
 modelSet=_model.scenarioMip#[[22],:]
 
-
-# In[7]:
-
-
+#indeces
 sstIndeces = _index.sstIndex.keys()
 pslIndeces = _index.pslIndex
-
-
-# In[8]:
-
-
-len(modelSet)
 
 
 def allIndexCalc(sstDs,sstClimat,pslDs,pslClimat):
@@ -77,10 +49,6 @@ def allIndexCalc(sstDs,sstClimat,pslDs,pslClimat):
     return monthlyIndeces
 
 # Climatology and piControl:
-
-# In[ ]:
-
-'''
 for iModel in modelSet:
     
     print(iModel)
@@ -105,11 +73,11 @@ for iModel in modelSet:
     except Exception as e:
         print(iModel[1] + "Climatology did not calculate")
         print(e)
-'''
+
 
 for iModel in modelSet:
     
-    '''try:
+    try:
         print(iModel)
         sstClimat=dict()
 
@@ -137,10 +105,6 @@ for iModel in modelSet:
         print(e) 
 
 # Historical Indeces
-
-# In[ ]:
-
-
 for iModel in modelSet:
     
     print(iModel)
@@ -177,12 +141,8 @@ for iModel in modelSet:
         print(e)
         
 
-'''
+
 # Scenario Indeces
-
-# In[ ]:
-
-
 for iModel in modelSet:
     
     print(iModel)
