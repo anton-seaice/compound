@@ -23,11 +23,16 @@ Dependencies
 xarray 0.18.0
 numpy 1.17.0
 cartopy 0.18.0
-eofs-1.4.0
+eofs [https://github.com/ajdawson/eofs/tree/9d206001a1d841fa649dce359554d43e315801b6]
 nc-time-axis 1.3.1
 xesmf 0.5.3
 matplotlib 3.4.2
 
+
+If you prefer, there is a yaml file in ref folder, or you can 
+`module use /g/data/hh5/public/modules
+module load conda/analysis3`
+on nci. (With the exception of the eofs package)
 
 CESM Descriptions:
 

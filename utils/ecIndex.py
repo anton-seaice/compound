@@ -1,5 +1,4 @@
-import sys
-sys.path.append('/../')
+_work_dir='/g/data/gv90/as2285/compound/'
 
 #import my functions
 import helpers.fileHandler as fh
@@ -12,8 +11,11 @@ import utils.sstIndex as sst
 
 import xarray
 import numpy
-from eofs.xarray import Eof
+# from eofs.xarray import Eof
 
+from importlib.machinery import SourceFileLoader
+eofs = SourceFileLoader('eof.xarray',f'{_work_dir}eofs/lib/eofs/__init__.py').load_module()
+Eof=eofs.Eof
 
 def anoms(xr):
     '''Calculate an anomaly for the provided, using 1900 to 2000 climatology'''
